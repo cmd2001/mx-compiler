@@ -16,7 +16,7 @@ funcDefStatement : (Type | Void) Identifier '(' argList ')' block;
 arg : Type Identifier;
 argList : arg*;
 classDefStatement : Class Identifier '{'(funcDefStatement | constructFuncDefStatement | varDefStatement)'}' ';';
-varDefStatement : Type varDefList;
+varDefStatement : Type varDefList ';';
 varDefList : varDef+;
 varDef : Identifier ('=' expression)?;
 constructFuncDefStatement : Identifier '(' ')' block;
@@ -101,7 +101,7 @@ LogicConstant : True | False;
 IntConstant : '0' | (NonZeroDigit Digit*);
 StringConstant : '"' Characters* '"';
 Identifier : IdentifierCharacters+;
-BasicType : (Int | Bool | String | Identifier);
+BasicType : Int | Bool | String | Identifier;
 Type : (BasicType'[' ']') | BasicType;
 
 Whitespace : [ \t]+ -> skip;

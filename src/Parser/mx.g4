@@ -9,30 +9,34 @@ program : compoundStatement*;
 compoundStatement :
       funcDefStatement
     | classDefStatement
-    | varDefStatement
+    | varDefStatement ';'
     | ';';
 
-funcDefStatement : (Type | Void) Identifier '(' argList ')' block;
-arg : Type Identifier;
-argList : arg*;
-classDefStatement : Class Identifier '{'(funcDefStatement | constructFuncDefStatement | varDefStatement)'}' ';';
-varDefStatement : Type varDefList ';';
-varDefList : varDef+;
+funcDefStatement : (type | Void) Identifier '(' argList ')' block;
+arg : type Identifier;
+argList : arg? (',' arg)*;
+classDefStatement : Class Identifier '{' (funcDefStatement | constructFuncDefStatement | (varDefStatement ';') | ';')* '}' ';';
+varDefStatement : type varDefList;
+varDefList : varDef (','varDef)*;
 varDef : Identifier ('=' expression)?;
 constructFuncDefStatement : Identifier '(' ')' block;
 
 block : '{' statement* '}';
+
+simpleStatement:
+    Return expression?                                                          #returnStatement
+    | Break                                                                     #breakStatement
+    | Continue                                                                  #continueStatement
+    | expression                                                                #expressionStatement
+    | block                                                                     #blockStatement
+    | varDefStatement                                                           #varStatement
+    ;
+
 statement :
-      If '(' expression ')' block (Else block) ?                                #ifStatement
-    | While '(' expression ')' block                                            #whileStatement
-    | For '(' statement ';' expressionList ';' statement ')' block              #forStatement
-    | Return expression?                                                        #returnStatement
-    | Break ';'                                                                 #breakStatement
-    | Continue ';'                                                              #continueStatement
-    | expression ';'                                                            #expressionStatement
-    | block ';'                                                                 #blockStatement
-    | varDefStatement ';'                                                       #varStatement
-    | ';'                                                                       #emptyStatement
+      If '(' expression ')' (block | statement) (Else (block | statement)) ?                  #ifStatement
+    | While '(' expression? ')' (block | statement)                                           #whileStatement
+    | For '(' simpleStatement ';' expressionList ';' simpleStatement ')' (block | statement)  #forStatement
+    | simpleStatement ';'                                                                     #containSimpleStatement
     ;
 
 expression:
@@ -57,14 +61,14 @@ expression:
     | <assoc=right> src1=expression op='=' src2=expression            #binaryExpression
     | '(' expression ')'                                              #subExpression
     | This                                                            #thisExpression
-    | Constant                                                        #constExpression
+    | constant                                                        #constExpression
     | Identifier                                                      #idExpression
     ;
 
 creator :
-    BasicType                                                         #basicCreator
-    | BasicType '(' ')'                                               #classCreator
-    | BasicType ('[' expression? ']')+                                #arrayCreator
+    basicType                                                         #basicCreator
+    | basicType '(' ')'                                               #classCreator
+    | basicType ('[' expression? ']')+                                #arrayCreator
     ;
 
 expressionList : expression (',' expression)*;
@@ -76,7 +80,7 @@ String: 'string';
 Null : 'null';
 Void : 'void';
 True : 'true';
-False : 'False';
+False : 'false';
 If : 'if';
 Else : 'else';
 For : 'for';
@@ -96,13 +100,15 @@ fragment Characters : EscapeCharacters | PrintableCharacters;
 fragment IdentifierCharacters : [a-z] | [A-Z] | [0-9] | '_';
 
 
-Constant : LogicConstant | IntConstant | StringConstant | Null;
-LogicConstant : True | False;
+constant : logicConstant | IntConstant | StringConstant | Null;
+logicConstant : True | False;
 IntConstant : '0' | (NonZeroDigit Digit*);
 StringConstant : '"' Characters* '"';
 Identifier : IdentifierCharacters+;
-BasicType : Int | Bool | String | Identifier;
-Type : (BasicType'[' ']') | BasicType;
+basicType : Int | Bool | String | Identifier;
+type : (basicType('[' ']')+)                  #arrayType
+       | basicType                            #simpleType
+       ;
 
 Whitespace : [ \t]+ -> skip;
 Newline : ('\r''\n'?|'\n') -> skip;

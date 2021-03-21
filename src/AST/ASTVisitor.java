@@ -1,6 +1,7 @@
 package AST;
 
 public interface ASTVisitor {
+    void visit(ASTNode it);
     void visit(FunctionDefNode it);
     void visit(VariableNode it);
     void visit(StatementNode it);

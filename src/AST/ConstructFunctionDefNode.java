@@ -4,16 +4,13 @@ import Util.Type;
 import Util.position;
 
 public class ConstructFunctionDefNode extends ASTNode {
-    private Type type;
-    private String iden;
+    public String constructionFunctionName;
+    BlockNode block;
+
     public ConstructFunctionDefNode(position pos) {
         super(pos);
     }
 
-    @Override
-    public String toString() {
-        return "";
-    }
 
     @Override
     public void accept(ASTVisitor visitor) {

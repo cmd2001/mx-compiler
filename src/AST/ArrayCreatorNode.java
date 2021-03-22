@@ -2,14 +2,14 @@ package AST;
 
 import Util.position;
 
+import java.util.ArrayList;
+
 public class ArrayCreatorNode extends ASTNode {
+    public BasicTypeNode basicType;
+    public ArrayList<ExpressionNode> sizes = new ArrayList<>();
+
     public ArrayCreatorNode(position pos) {
         super(pos);
-    }
-
-    @Override
-    public String toString() {
-        return "";
     }
 
     @Override

@@ -1,10 +1,13 @@
 package AST;
 
+
 import Util.position;
 
-public class IdExpressionNode extends ASTNode {
+public class BasicTypeNode extends ASTNode {
+    public boolean isInt = false, isBool = false, isString =false, isIdentifier = false;
     public String id;
-    public IdExpressionNode(position pos) {
+
+    public BasicTypeNode(position pos) {
         super(pos);
     }
 

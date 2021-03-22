@@ -3,13 +3,12 @@ package AST;
 import Util.position;
 
 public class PostfixExpressionNode extends ASTNode {
+    public enum PostfixOp {None, PlusPlus, SubSub}
+    public PostfixOp op = PostfixOp.None;
+    public ExpressionNode expression;
+
     public PostfixExpressionNode(position pos) {
         super(pos);
-    }
-
-    @Override
-    public String toString() {
-        return "";
     }
 
     @Override

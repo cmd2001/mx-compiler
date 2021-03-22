@@ -3,13 +3,10 @@ package AST;
 public interface ASTVisitor {
     void visit(ASTNode it);
     void visit(FunctionDefNode it);
-    void visit(VariableNode it);
     void visit(StatementNode it);
     void visit(ClassDefNode it);
     void visit(ConstructFunctionDefNode it);
     void visit(SimpleStatementNode it);
-    void visit(BreakNode it);
-    void visit(ContinueNode it);
     void visit(ExpressionNode it);
     void visit(BlockNode it);
     void visit(VarDefNode it);

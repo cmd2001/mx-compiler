@@ -16,8 +16,7 @@ funcDefStatement : (type | Void) Identifier '(' argList ')' block;
 arg : type Identifier;
 argList : arg? (',' arg)*;
 classDefStatement : Class Identifier '{' (funcDefStatement | constructFuncDefStatement | (varDefStatement ';') | ';')* '}' ';';
-varDefStatement : type varDefList;
-varDefList : varDef (','varDef)*;
+varDefStatement : type varDef (','varDef)*;
 varDef : Identifier ('=' expression)?;
 constructFuncDefStatement : Identifier '(' ')' block;
 
@@ -44,7 +43,7 @@ expression:
     | <assoc=right> New creator                                       #newExpression
     | expression '.' Identifier                                       #memberExpression
     | expression '(' expressionList? ')'                              #funcCallExpression
-    | expression '[' expression ']'                                   #subscriptExpression
+    | array=expression '[' index=expression ']'                                   #subscriptExpression
     | <assoc=right> op=('++' | '--') expression                       #prefixExpression
     | <assoc=right> op=( '+' | '-' ) expression                       #prefixExpression
     | <assoc=right> op=( '!' | '~' ) expression                       #prefixExpression

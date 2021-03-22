@@ -7,10 +7,6 @@ public class SimpleTypeNode extends ASTNode {
         super(pos);
     }
 
-    @Override
-    public String toString() {
-        return "";
-    }
 
     @Override
     public void accept(ASTVisitor visitor) {

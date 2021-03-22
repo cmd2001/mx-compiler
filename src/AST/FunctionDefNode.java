@@ -1,7 +1,6 @@
 package AST;
 
 import Util.position;
-import Util.Type;
 
 import java.util.ArrayList;
 
@@ -12,13 +11,8 @@ public class FunctionDefNode extends ASTNode {
     public String funcName;
     public BlockNode funcBody;
 
-    public FunctionDefNode(position pos, TypeNode returnType, ArrayList<TypeNode> argTypes, ArrayList<String> argNames, String funcName, BlockNode funcBody) {
+    public FunctionDefNode(position pos) {
         super(pos);
-        this.returnType = returnType;
-        this.argTypes = argTypes;
-        this.argNames = argNames;
-        this.funcName = funcName;
-        this.funcBody = funcBody;
     }
 
     @Override

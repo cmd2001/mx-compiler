@@ -3,13 +3,9 @@ package AST;
 import Util.position;
 
 public class NewExpressionNode extends ASTNode {
+    public CreatorNode creator;
     public NewExpressionNode(position pos) {
         super(pos);
-    }
-
-    @Override
-    public String toString() {
-        return "";
     }
 
     @Override

@@ -2,14 +2,16 @@ package AST;
 
 import Util.position;
 
-public class ClassDefNode extends ASTNode {
-    public ClassDefNode(position pos) {
-        super(pos);
-    }
+import java.util.ArrayList;
 
-    @Override
-    public String toString() {
-        return "";
+public class ClassDefNode extends ASTNode {
+    public String className;
+    public ArrayList<FunctionDefNode> functions = new ArrayList<>();
+    public ConstructFunctionDefNode constructFunction;
+    public ArrayList<varDefStatementNode> variables = new ArrayList<>();
+
+    public ClassDefNode(position pos, String className) {
+        super(pos);
     }
 
     @Override

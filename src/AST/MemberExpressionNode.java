@@ -3,13 +3,11 @@ package AST;
 import Util.position;
 
 public class MemberExpressionNode extends ASTNode {
+    public ExpressionNode expression;
+    public String id;
+
     public MemberExpressionNode(position pos) {
         super(pos);
-    }
-
-    @Override
-    public String toString() {
-        return "";
     }
 
     @Override

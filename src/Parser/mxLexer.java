@@ -1,4 +1,5 @@
-// Generated from C:/Users/Amagi/IdeaProjects/mx-compiler/src/Parser\mx.g4 by ANTLR 4.9
+// Generated from /Users/xzy/IdeaProjects/mx-compiler/src/Parser/mx.g4 by ANTLR 4.9
+package Parser;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.Token;

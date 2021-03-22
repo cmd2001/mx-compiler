@@ -1,5 +1,3 @@
-// Type.java from ZYHowell/Yx
-
 package Util;
 
 public class Type {

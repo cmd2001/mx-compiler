@@ -3,13 +3,10 @@ package AST;
 import Util.position;
 
 public class ArrayTypeNode extends ASTNode {
+    public BasicTypeNode basicType;
+
     public ArrayTypeNode(position pos) {
         super(pos);
-    }
-
-    @Override
-    public String toString() {
-        return "";
     }
 
     @Override

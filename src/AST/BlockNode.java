@@ -2,14 +2,13 @@ package AST;
 
 import Util.position;
 
+import java.util.ArrayList;
+
 public class BlockNode extends ASTNode {
+    public ArrayList<StatementNode> statements = new ArrayList<>();
+
     public BlockNode(position pos) {
         super(pos);
-    }
-
-    @Override
-    public String toString() {
-        return "";
     }
 
     @Override

@@ -1,5 +1,3 @@
-// position.java from ZYHowell/Yx
-
 package Util;
 
 import org.antlr.v4.runtime.ParserRuleContext;

@@ -3,7 +3,7 @@ package AST;
 import Util.position;
 
 public class PostfixExpressionNode extends ASTNode {
-    public enum PostfixOp {None, PlusPlus, SubSub}
+    public enum PostfixOp {None, AddAdd, SubSub}
     public PostfixOp op = PostfixOp.None;
     public ExpressionNode expression;
 

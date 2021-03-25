@@ -5,6 +5,7 @@ import Util.position;
 import java.util.ArrayList;
 
 public class FunctionDefNode extends ASTNode {
+    public boolean isNull = false;
     public TypeNode returnType;
     public ArrayList<TypeNode> argTypes = new ArrayList<>();
     public ArrayList<String> argNames = new ArrayList<>();

@@ -2,6 +2,8 @@ package AST;
 
 public interface ASTVisitor {
     void visit(ASTNode it);
+    void visit(ProgramNode it);
+    void visit(CompoundStatementNode it);
     void visit(FunctionDefNode it);
     void visit(StatementNode it);
     void visit(ClassDefNode it);
@@ -31,5 +33,6 @@ public interface ASTVisitor {
     void visit(TypeNode it);
     void visit(ArrayTypeNode it);
     void visit(SimpleTypeNode it);
+    void visit(VarDefStatementNode it);
     // etc...
 }

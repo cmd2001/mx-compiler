@@ -8,9 +8,9 @@ public class ClassDefNode extends ASTNode {
     public String className;
     public ArrayList<FunctionDefNode> functions = new ArrayList<>();
     public ConstructFunctionDefNode constructFunction;
-    public ArrayList<varDefStatementNode> variables = new ArrayList<>();
+    public ArrayList<VarDefStatementNode> variables = new ArrayList<>();
 
-    public ClassDefNode(position pos, String className) {
+    public ClassDefNode(position pos) {
         super(pos);
     }
 

@@ -3,7 +3,7 @@ package AST;
 import Util.position;
 
 public class PrefixExpressionNode extends ASTNode {
-    public enum PrefixOp {None, PlusPlus, SubSub, Plus, Sub, Not, Neg}
+    public enum PrefixOp {None, AddAdd, SubSub, Add, Sub, Not, Neg}
     public PrefixOp op = PrefixOp.None;
     public ExpressionNode expression;
 

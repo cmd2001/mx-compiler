@@ -5,7 +5,7 @@ import Util.position;
 
 public class ConstructFunctionDefNode extends ASTNode {
     public String constructionFunctionName;
-    BlockNode block;
+    public BlockNode block;
 
     public ConstructFunctionDefNode(position pos) {
         super(pos);

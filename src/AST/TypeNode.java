@@ -3,9 +3,8 @@ package AST;
 import Util.position;
 
 public class TypeNode extends ASTNode {
-    boolean isArrayType = false, isSimpleType = false;
-    ArrayTypeNode arrayType;
-    BasicTypeNode basicType;
+    public boolean isArrayType = false, isSimpleType = false;
+    public BasicTypeNode basicType;
 
     public TypeNode(position pos) {
         super(pos);

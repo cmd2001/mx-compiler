@@ -2,11 +2,11 @@ package AST;
 
 import Util.position;
 
+import java.util.ArrayList;
+
 public class ForNode extends ASTNode {
-    public boolean forIsBlock = false;
     public SimpleStatementNode forStatement1, forStatement3;
-    public ExpressionNode forExpression;
-    public BlockNode forBlock;
+    public ArrayList<ExpressionNode> forExpressions;
     public StatementNode forStatement;
 
     public ForNode(position pos) {

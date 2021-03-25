@@ -3,9 +3,8 @@ package AST;
 import Util.position;
 
 public class IfNode extends ASTNode {
-    public boolean ifIsBlock = false, elseIsBlock = false;
-    public ExpressionNode ifExpression;
-    public BlockNode ifBlock, elseBlock;
+    public boolean haveElse = false;
+    public ExpressionNode expression;
     public StatementNode ifStatement, elseStatement;
 
     public IfNode(position pos) {

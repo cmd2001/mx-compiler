@@ -32,10 +32,10 @@ simpleStatement:
     ;
 
 statement :
-      If '(' expression ')' (block | statement) (Else (block | statement)) ?                  #ifStatement
-    | While '(' expression? ')' (block | statement)                                           #whileStatement
-    | For '(' simpleStatement ';' expressionList ';' simpleStatement ')' (block | statement)  #forStatement
-    | simpleStatement ';'                                                                     #containSimpleStatement
+      If '(' expression ')' statement (Else statement) ?                                            #ifStatement
+    | While '(' expression? ')' statement                                                           #whileStatement
+    | For '(' stmt1=simpleStatement? ';' expressionList ';' stmt2=simpleStatement? ')' statement    #forStatement
+    | simpleStatement ';'                                                                           #containSimpleStatement
     ;
 
 expression:
@@ -43,7 +43,7 @@ expression:
     | <assoc=right> New creator                                       #newExpression
     | expression '.' Identifier                                       #memberExpression
     | expression '(' expressionList? ')'                              #funcCallExpression
-    | array=expression '[' index=expression ']'                                   #subscriptExpression
+    | array=expression '[' index=expression ']'                       #subscriptExpression
     | <assoc=right> op=('++' | '--') expression                       #prefixExpression
     | <assoc=right> op=( '+' | '-' ) expression                       #prefixExpression
     | <assoc=right> op=( '!' | '~' ) expression                       #prefixExpression

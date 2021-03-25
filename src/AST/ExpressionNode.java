@@ -7,17 +7,17 @@ public class ExpressionNode extends ASTNode {
 
     public ExpressionType expressionType = ExpressionType.None;
 
-    PostfixExpressionNode postfixExpressionNode;
-    NewExpressionNode newExpressionNode;
-    MemberExpressionNode memberExpressionNode;
-    FuncCallExpressionNode funcCallExpressionNode;
-    SubscriptExpressionNode subscriptExpressionNode;
-    PrefixExpressionNode prefixExpressionNode;
-    BinaryExpressionNode binaryExpressionNode;
-    SubExpressionNode subExpressionNode;
-    ThisExpressionNode thisExpressionNode;
-    ConstExpressionNode constExpressionNode;
-    IdExpressionNode idExpressionNode;
+    public PostfixExpressionNode postfixExpressionNode;
+    public NewExpressionNode newExpressionNode;
+    public MemberExpressionNode memberExpressionNode;
+    public FuncCallExpressionNode funcCallExpressionNode;
+    public SubscriptExpressionNode subscriptExpressionNode;
+    public PrefixExpressionNode prefixExpressionNode;
+    public BinaryExpressionNode binaryExpressionNode;
+    public SubExpressionNode subExpressionNode;
+    public ThisExpressionNode thisExpressionNode;
+    public ConstExpressionNode constExpressionNode;
+    public IdExpressionNode idExpressionNode;
 
     public ExpressionNode(position pos) {
         super(pos);

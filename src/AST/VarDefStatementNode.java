@@ -4,11 +4,11 @@ import Util.position;
 
 import java.util.ArrayList;
 
-public class varDefStatementNode extends ASTNode {
+public class VarDefStatementNode extends ASTNode {
     public TypeNode type;
     public ArrayList<VarDefNode> variables = new ArrayList<>();
 
-    public varDefStatementNode(position pos) {
+    public VarDefStatementNode(position pos) {
         super(pos);
     }
 

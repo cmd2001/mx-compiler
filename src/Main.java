@@ -1,0 +1,37 @@
+import AST.ProgramNode;
+import Util.error;
+
+import Util.mxErrorListener;
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
+
+import Parser.mxLexer;
+import Parser.mxParser;
+
+import Frontend.ASTBuilder;
+
+import java.io.FileInputStream;
+import java.io.InputStream;
+
+
+public class Main {
+    public static void main(String[] args) throws Exception {
+        String name = "test.mx";
+        InputStream input = new FileInputStream(name);
+        try {
+            mxLexer lexer = new mxLexer(CharStreams.fromStream(input));
+            lexer.removeErrorListeners();
+            lexer.addErrorListener(new mxErrorListener());
+            mxParser parser = new mxParser(new CommonTokenStream(lexer));
+            parser.removeErrorListeners();
+            parser.addErrorListener(new mxErrorListener());
+            ParseTree parseTreeRoot = parser.program();
+            ASTBuilder astBuilder = new ASTBuilder();
+            ProgramNode ASTRoot = (ProgramNode) astBuilder.visit(parseTreeRoot);
+        } catch (error er) {
+            System.err.println(er.toString());
+            throw new RuntimeException();
+        }
+    }
+}

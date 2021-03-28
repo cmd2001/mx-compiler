@@ -3,7 +3,6 @@ package Frontend;
 import AST.*;
 import Parser.mxBaseVisitor;
 import Parser.mxParser;
-import Util.Type;
 import Util.position;
 
 public class ASTBuilder extends mxBaseVisitor<ASTNode> {

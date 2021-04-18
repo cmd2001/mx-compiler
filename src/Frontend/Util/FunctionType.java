@@ -4,18 +4,28 @@ import AST.FunctionDefNode;
 import AST.TypeNode;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class FunctionType extends Type {
     public String name;
     public Type returnType;
-    public ArrayList<TypeNode> argTypes;
-    public ArrayList<String> argNames;
+    public HashMap<String, Variable> args = new HashMap<>();
 
     public FunctionType(FunctionDefNode defNode, boolean isConstructor) {
         super(isConstructor ? Category.CONSTRUCTOR : Category.FUNC);
         this.name = defNode.funcName;
-        returnType = defNode.isVoid ? new BasicType(Category.NULL) : new TypeBuilder().build(defNode.returnType);
-        this.argTypes = defNode.argTypes;
-        this.argNames = defNode.argNames;
+        TypeBuilder builder = new TypeBuilder();
+        returnType = defNode.isVoid ? new BasicType(Category.NULL) : builder.build(defNode.returnType);
+        for(int i = 0; i < defNode.argTypes.size(); i++) {
+            String name = defNode.argNames.get(i);
+            Type type = builder.build(defNode.argTypes.get(i));
+            args.put(name, new Variable(type, name));
+        }
     }
+    public FunctionType(String name, Type returnType) {
+        super(Category.FUNC);
+        this.name = name;
+        this.returnType = returnType;
+    }
+    public void addArg(Variable variable) { args.put(variable.name, variable); }
 }

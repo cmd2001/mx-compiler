@@ -4,9 +4,9 @@ import java.util.HashMap;
 import Util.*;
 
 public class Scope {
-    private HashMap<String, FunctionType> functions; // variable and function can use same name.
-    private HashMap<String, Variable> variables;
-    private FunctionType constructor;
+    private HashMap<String, FunctionType> functions = new HashMap<>(); // variable and function can use same name.
+    private HashMap<String, Variable> variables = new HashMap<>();
+    private FunctionType constructor = null;
     private Scope parent;
 
     public Scope(Scope parent) { this.parent = parent; }
@@ -48,4 +48,5 @@ public class Scope {
     public FunctionType getConstructor() {
         return constructor;
     }
+    public Scope getParent() { return parent; }
 }

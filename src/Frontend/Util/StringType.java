@@ -1,5 +1,8 @@
 package Frontend.Util;
 
-public class StringType extends Type {
-    public StringType() { super(Category.STRING); }
+public class StringType extends ClassType {
+    public StringType() {
+        super("string");
+        this.category = Category.STRING;
+    }
 }

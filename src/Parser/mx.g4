@@ -105,10 +105,12 @@ IntConstant : '0' | (NonZeroDigit Digit*);
 StringConstant : '"' Characters* '"';
 Identifier : IdentifierCharacters+;
 basicType : Int | Bool | String | Identifier;
-type : (basicType('[' ']')+)                  #arrayType
-       | basicType                            #simpleType
+type : (basicType(LeftBracket RightBracket)+)  #arrayType
+       | basicType                             #simpleType
        ;
 
+LeftBracket : '[';
+RightBracket: ']';
 Whitespace : [ \t]+ -> skip;
 Newline : ('\r''\n'?|'\n') -> skip;
 BlockComment : '/*' .*? '*/' -> skip;

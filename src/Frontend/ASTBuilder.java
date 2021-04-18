@@ -32,7 +32,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	@Override
 	public FunctionDefNode visitFuncDefStatement(mxParser.FuncDefStatementContext ctx) {
 		FunctionDefNode ret = new FunctionDefNode(new position(ctx));
-		if(ctx.Void() != null) ret.isNull = true;
+		if(ctx.Void() != null) ret.isVoid = true;
 		else ret.returnType = (TypeNode) visit(ctx.type());
 		ret.funcName = ctx.Identifier().getText();
 		for(var x: ctx.argList().arg()) {
@@ -351,6 +351,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public TypeNode visitArrayType(mxParser.ArrayTypeContext ctx) {
 		TypeNode ret = new TypeNode(new position(ctx));
 		ret.isArrayType = true;
+		ret.arrayDim = ctx.LeftBracket().size();
 		ret.basicType = visitBasicType(ctx.basicType());
 		return ret;
 	}

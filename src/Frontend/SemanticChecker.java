@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Stack;
 
-public class semanticChecker implements ASTVisitor {
+public class SemanticChecker implements ASTVisitor {
     HashSet<String> types;
     Stack<HashMap<String, Type> > variable;
     @Override

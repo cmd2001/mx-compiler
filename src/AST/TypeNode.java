@@ -5,6 +5,7 @@ import Util.position;
 public class TypeNode extends ASTNode {
     public boolean isArrayType = false, isSimpleType = false;
     public BasicTypeNode basicType;
+    public int arrayDim;
 
     public TypeNode(position pos) {
         super(pos);

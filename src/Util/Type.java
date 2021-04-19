@@ -17,4 +17,13 @@ public abstract class Type {
     public boolean isVoid() { return category == Category.VOID; }
     public boolean isFunc() { return category == Category.FUNC; }
     public boolean isConstructor() { return category == Category.CONSTRUCTOR; }
+    public String toString() {
+        return switch (category) { // string has been override in ClassType.
+            case NULL -> "null";
+            case INT -> "int";
+            case BOOL -> "bool";
+            case VOID -> "void";
+            default -> throw new IllegalStateException("Unexpected value: " + category);
+        };
+    }
 }

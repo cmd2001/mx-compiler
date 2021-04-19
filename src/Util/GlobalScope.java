@@ -23,13 +23,13 @@ public class GlobalScope extends Scope {
         // add string
         ClassType stringInstance = new StringType();
         FunctionType func = new FunctionType("length", intInstance);
-        stringInstance.defineFunction(func);
+        stringInstance.defineFunction(func, pos);
         func = new FunctionType("substring", stringInstance);
         func.addArg(new Variable(intInstance, "left"));
         func.addArg(new Variable(intInstance, "right"));
-        stringInstance.defineFunction(func);
+        stringInstance.defineFunction(func, pos);
         func = new FunctionType("parseInt", intInstance);
-        stringInstance.defineFunction(func);
+        stringInstance.defineFunction(func, pos);
         func = new FunctionType("ord", intInstance);
         func.addArg(new Variable(intInstance, "pos"));
         addType("string", stringInstance, pos);
@@ -65,23 +65,19 @@ public class GlobalScope extends Scope {
     public boolean hasType(String name) {
         return types.containsKey(name);
     }
+    public boolean hasVariable(String name) { return hasVariable(name, false); }
+    public boolean hasFunction(String name) { return hasFunction(name, false); }
+
+    public boolean checkClassName(String name) { return !(hasType(name) || hasVariable(name) || hasFunction(name)); }
+    public boolean checkFunctionName(String name) { return !(hasType(name) || hasFunction(name)); }
+    public boolean checkVariableName(String name) { return !(hasType(name) || hasVariable(name)); }
+
     public Type getType(String name) {
         return types.get(name);
     }
-
-    public Type getIntInstance() {
-        return types.get("int");
-    }
-    public Type getBoolInstance() {
-        return types.get("bool");
-    }
-    public Type getNullInstance() {
-        return types.get("null");
-    }
-    public Type getVoidInstance() {
-        return types.get("void");
-    }
-    public Type getStringInstance() {
-        return types.get("string");
-    }
+    public Type getIntType() { return types.get("int"); }
+    public Type getBoolType() { return types.get("bool"); }
+    public Type getNullType() { return types.get("null"); }
+    public Type getVoidType() { return types.get("void"); }
+    public Type getStringType() { return types.get("string"); }
 }

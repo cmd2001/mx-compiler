@@ -1,8 +1,10 @@
 package AST;
 
+import Util.Type;
 import Util.position;
 
 public class ThisExpressionNode extends ASTNode {
+    public Type valueType;
     public ThisExpressionNode(position pos) {
         super(pos);
     }

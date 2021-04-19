@@ -1,5 +1,6 @@
 package AST;
 
+import Util.Type;
 import Util.position;
 
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 public class FuncCallExpressionNode extends ASTNode {
     public ExpressionNode expression;
     public ArrayList<ExpressionNode> parameters = new ArrayList<>();
+    public Type valueType;
 
     public FuncCallExpressionNode(position pos) {
         super(pos);

@@ -1,11 +1,13 @@
 package AST;
 
+import Util.Type;
 import Util.position;
 
 public class ExpressionNode extends ASTNode {
     public enum ExpressionType {None, Postfix, New, Member, FunCall, Subscript, Prefix, Binary, Sub, This, Const, Id}
 
     public ExpressionType expressionType = ExpressionType.None;
+    public Type valueType;
 
     public PostfixExpressionNode postfixExpressionNode;
     public NewExpressionNode newExpressionNode;

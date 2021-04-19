@@ -1,5 +1,6 @@
 package AST;
 
+import Util.Type;
 import Util.position;
 
 public class ConstExpressionNode extends ASTNode {
@@ -7,6 +8,7 @@ public class ConstExpressionNode extends ASTNode {
     public boolean logicConstant;
     public int intConstant;
     public String stringConstant;
+    public Type valueType;
 
     public ConstExpressionNode(position pos) {
         super(pos);

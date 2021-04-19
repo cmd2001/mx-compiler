@@ -14,6 +14,7 @@ public class FunctionType extends Type {
         this.name = defNode.funcName;
         TypeBuilder builder = new TypeBuilder();
         returnType = defNode.isVoid ? new BasicType(Category.NULL) : builder.build(defNode.returnType);
+        assert (defNode.argTypes.size() == defNode.argNames.size());
         for(int i = 0; i < defNode.argTypes.size(); i++) {
             String name = defNode.argNames.get(i);
             Type type = builder.build(defNode.argTypes.get(i));

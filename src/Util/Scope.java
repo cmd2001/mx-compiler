@@ -38,11 +38,15 @@ public class Scope {
         return false;
     }
 
-    public FunctionType getFunction(String name) {
-        return functions.get(name);
+    public FunctionType getFunction(String name, boolean rec) {
+        if(functions.containsKey(name)) return functions.get(name);
+        if(rec && parent != null) return parent.getFunction(name, rec);
+        throw new internalError("Error: Scope.getFunction", new position(0, 0));
     }
-    public Variable getVariable(String name) {
-        return variables.get(name);
+    public Variable getVariable(String name, boolean rec) {
+        if(variables.containsKey(name)) return variables.get(name);
+        if(rec && parent != null) return parent.getVariable(name, rec);
+        throw new internalError("Error: Scope.getVariable", new position(0, 0));
     }
     public FunctionType getConstructor() {
         return constructor;

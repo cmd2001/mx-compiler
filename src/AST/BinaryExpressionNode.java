@@ -1,11 +1,13 @@
 package AST;
 
+import Util.Type;
 import Util.position;
 
 public class BinaryExpressionNode extends ASTNode {
     public enum BianryOp {None, Mul, Div, Mod, Add, Sub, ShL, ShR, Less, Greater, LessEqual, GreaterEqual, Equal, NotEqual, And, Xor, Or, AndAnd, OrOr, Assign}
     public BianryOp op;
     public ExpressionNode src1, src2;
+    public Type valueType;
 
     public BinaryExpressionNode(position pos) {
         super(pos);

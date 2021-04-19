@@ -1,9 +1,7 @@
-package Frontend.Util;
+package Util;
 
 import AST.FunctionDefNode;
-import AST.TypeNode;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FunctionType extends Type {

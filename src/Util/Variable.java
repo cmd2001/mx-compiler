@@ -1,4 +1,4 @@
-package Frontend.Util;
+package Util;
 
 public class Variable {
     public Type type;

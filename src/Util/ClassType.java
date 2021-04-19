@@ -1,4 +1,4 @@
-package Frontend.Util;
+package Util;
 
 import java.util.HashMap;
 

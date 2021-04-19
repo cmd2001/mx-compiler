@@ -1,8 +1,7 @@
-package Frontend.Util;
+package Util;
 
 import AST.BasicTypeNode;
 import AST.TypeNode;
-import Util.*;
 
 public class TypeBuilder {
     Type build(BasicTypeNode basicTypeNode) {

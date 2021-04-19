@@ -1,4 +1,4 @@
-package Frontend.Util;
+package Util;
 
 public class StringType extends ClassType {
     public StringType() {

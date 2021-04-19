@@ -1,9 +1,5 @@
-package Frontend.Util;
+package Util;
 
-import Util.*;
-
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 
 public class GlobalScope extends Scope {

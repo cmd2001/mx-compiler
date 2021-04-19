@@ -1,7 +1,6 @@
-package Frontend.Util;
+package Util;
 
 import java.util.HashMap;
-import Util.*;
 
 public class Scope {
     private HashMap<String, FunctionType> functions = new HashMap<>(); // variable and function can use same name.

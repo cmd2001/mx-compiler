@@ -48,7 +48,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 		ClassDefNode ret = new ClassDefNode(new position(ctx));
 		ret.className = ctx.Identifier().getText();
 		for(var x: ctx.funcDefStatement()) ret.functions.add(visitFuncDefStatement(x));
-		for(var x: ctx.constructFuncDefStatement()) ret.constructFunction = visitConstructFuncDefStatement(x);
+		for(var x: ctx.constructFuncDefStatement()) ret.constructFunctions.add(visitConstructFuncDefStatement(x));
 		for(var x: ctx.varDefStatement()) ret.variables.add(visitVarDefStatement(x));
 		return ret;
 	}
@@ -81,6 +81,14 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public BlockNode visitBlock(mxParser.BlockContext ctx) {
 		BlockNode ret = new BlockNode(new position(ctx));
 		for(var x: ctx.statement()) ret.statements.add((StatementNode) visit(x));
+		return ret;
+	}
+
+	@Override
+	public SimpleStatementNode visitReturnStatement(mxParser.ReturnStatementContext ctx) {
+		SimpleStatementNode ret = new SimpleStatementNode(new position(ctx));
+		ret.isReturn = true;
+		if(ctx.expression() != null) ret.expression = (ExpressionNode) visit(ctx.expression());
 		return ret;
 	}
 
@@ -149,10 +157,10 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public StatementNode visitForStatement(mxParser.ForStatementContext ctx) {
 		StatementNode ret = new StatementNode(new position(ctx));
 		ret.isFor = true;
-		ret.forNode.forStatement1 = (SimpleStatementNode) visit(ctx.stmt1);
-		ret.forNode.forStatement3 = (SimpleStatementNode) visit(ctx.stmt2);
+		if(ctx.stmt1 != null) ret.forNode.forStatement1 = (SimpleStatementNode) visit(ctx.stmt1);
+		if(ctx.stmt2 != null) ret.forNode.forStatement3 = (SimpleStatementNode) visit(ctx.stmt2);
 		ret.forNode.forStatement = (StatementNode) visit(ctx.statement());
-		for(var x: ctx.expressionList().expression()) ret.forNode.forExpressions.add((ExpressionNode) visit(x));
+		ret.forNode.forExpression = (ExpressionNode) visit(ctx.condition);
 		return ret;
 	}
 

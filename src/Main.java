@@ -1,4 +1,5 @@
 import AST.ProgramNode;
+import Frontend.SemanticChecker;
 import Util.error;
 
 import Util.mxErrorListener;
@@ -29,6 +30,7 @@ public class Main {
             ParseTree parseTreeRoot = parser.program();
             ASTBuilder astBuilder = new ASTBuilder();
             ProgramNode ASTRoot = (ProgramNode) astBuilder.visit(parseTreeRoot);
+            new SemanticChecker().visit(ASTRoot);
         } catch (error er) {
             System.err.println(er.toString());
             throw new RuntimeException();

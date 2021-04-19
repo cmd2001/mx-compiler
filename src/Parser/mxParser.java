@@ -909,13 +909,14 @@ public class mxParser extends Parser {
 	}
 	public static class ForStatementContext extends StatementContext {
 		public SimpleStatementContext stmt1;
+		public ExpressionContext condition;
 		public SimpleStatementContext stmt2;
 		public TerminalNode For() { return getToken(mxParser.For, 0); }
-		public ExpressionListContext expressionList() {
-			return getRuleContext(ExpressionListContext.class,0);
-		}
 		public StatementContext statement() {
 			return getRuleContext(StatementContext.class,0);
+		}
+		public ExpressionContext expression() {
+			return getRuleContext(ExpressionContext.class,0);
 		}
 		public List<SimpleStatementContext> simpleStatement() {
 			return getRuleContexts(SimpleStatementContext.class);
@@ -1042,7 +1043,7 @@ public class mxParser extends Parser {
 				setState(152);
 				match(T__0);
 				setState(153);
-				expressionList();
+				((ForStatementContext)_localctx).condition = expression(0);
 				setState(154);
 				match(T__0);
 				setState(156);
@@ -2235,7 +2236,7 @@ public class mxParser extends Parser {
 		"\2\2\2\u0091\u0092\3\2\2\2\u0092\u0093\3\2\2\2\u0093\u0094\7\5\2\2\u0094"+
 		"\u00a7\5\30\r\2\u0095\u0096\7*\2\2\u0096\u0098\7\4\2\2\u0097\u0099\5\26"+
 		"\f\2\u0098\u0097\3\2\2\2\u0098\u0099\3\2\2\2\u0099\u009a\3\2\2\2\u009a"+
-		"\u009b\7\3\2\2\u009b\u009c\5\36\20\2\u009c\u009e\7\3\2\2\u009d\u009f\5"+
+		"\u009b\7\3\2\2\u009b\u009c\5\32\16\2\u009c\u009e\7\3\2\2\u009d\u009f\5"+
 		"\26\f\2\u009e\u009d\3\2\2\2\u009e\u009f\3\2\2\2\u009f\u00a0\3\2\2\2\u00a0"+
 		"\u00a1\7\5\2\2\u00a1\u00a2\5\30\r\2\u00a2\u00a7\3\2\2\2\u00a3\u00a4\5"+
 		"\26\f\2\u00a4\u00a5\7\3\2\2\u00a5\u00a7\3\2\2\2\u00a6\u0085\3\2\2\2\u00a6"+

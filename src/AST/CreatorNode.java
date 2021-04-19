@@ -1,5 +1,6 @@
 package AST;
 
+import Util.Type;
 import Util.position;
 
 public class CreatorNode extends ASTNode {
@@ -7,6 +8,7 @@ public class CreatorNode extends ASTNode {
     public BasicCreatorNode basicCreator;
     public ClassCreatorNode classCreator;
     public ArrayCreatorNode arrayCreator;
+    public Type valueType;
 
     public CreatorNode(position pos) {
         super(pos);

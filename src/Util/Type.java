@@ -1,7 +1,5 @@
 package Util;
 
-import AST.TypeNode;
-
 public abstract class Type {
     public enum Category {
         NULL, INT, BOOL, STRING, ARRAY, CLASS, VOID, FUNC, CONSTRUCTOR
@@ -25,5 +23,12 @@ public abstract class Type {
             case VOID -> "void";
             default -> throw new IllegalStateException("Unexpected value: " + category);
         };
+    }
+    public boolean equals(Type rhs) {
+        if(this instanceof ArrayType) {
+            ArrayType t = (ArrayType) this;
+            return t.equals(rhs);
+        }
+        return category == rhs.category;
     }
 }

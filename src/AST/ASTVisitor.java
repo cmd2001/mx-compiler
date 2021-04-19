@@ -11,7 +11,6 @@ public interface ASTVisitor {
     void visit(SimpleStatementNode it);
     void visit(ExpressionNode it);
     void visit(BlockNode it);
-    void visit(VarDefNode it);
     void visit(IfNode it);
     void visit(WhileNode it);
     void visit(ForNode it);
@@ -27,12 +26,6 @@ public interface ASTVisitor {
     void visit(ConstExpressionNode it);
     void visit(IdExpressionNode it);
     void visit(CreatorNode it);
-    void visit(BasicCreatorNode it);
-    void visit(ClassCreatorNode it);
-    void visit(ArrayCreatorNode it);
-    void visit(TypeNode it);
-    void visit(ArrayTypeNode it);
-    void visit(SimpleTypeNode it);
     void visit(VarDefStatementNode it);
     // etc...
 }

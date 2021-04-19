@@ -32,10 +32,10 @@ simpleStatement:
     ;
 
 statement :
-      If '(' expression ')' statement (Else statement) ?                                            #ifStatement
-    | While '(' expression? ')' statement                                                           #whileStatement
-    | For '(' stmt1=simpleStatement? ';' expressionList ';' stmt2=simpleStatement? ')' statement    #forStatement
-    | simpleStatement ';'                                                                           #containSimpleStatement
+      If '(' expression ')' statement (Else statement) ?                                                  #ifStatement
+    | While '(' expression? ')' statement                                                                 #whileStatement
+    | For '(' stmt1=simpleStatement? ';' condition=expression ';' stmt2=simpleStatement? ')' statement    #forStatement
+    | simpleStatement ';'                                                                                 #containSimpleStatement
     ;
 
 expression:

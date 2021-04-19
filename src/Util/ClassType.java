@@ -4,10 +4,10 @@ import java.util.HashMap;
 
 public class ClassType extends Type {
     public String name;
-    Scope localScope;
+    public Scope localScope;
 
     public ClassType(String name, Scope parent) { super(Category.CLASS); this.name = name; this.localScope = new Scope(parent); }
-    public boolean hasFunction(String name) { return localScope.hasFunction(name, false); }
+    public boolean hasFunction(String name, boolean rec) { return localScope.hasFunction(name, rec); }
     public FunctionType getFunction(String name, boolean rec) { return localScope.getFunction(name, rec); }
     public boolean hasVariable(String name, boolean rec) { return localScope.hasVariable(name, rec); }
     public Variable getVariable(String name, boolean rec) { return localScope.getVariable(name, rec); }
@@ -15,4 +15,8 @@ public class ClassType extends Type {
     public void defineVariable(Variable variable, position pos) { localScope.defineVariable(variable, pos); }
     @Override
     public String toString() { return name; }
+    public boolean equals(Type rhs) {
+        if(!(rhs instanceof ClassType)) return false;
+        return this.category == rhs.category && this.name.equals(((ClassType) rhs).name);
+    }
 }

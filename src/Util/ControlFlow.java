@@ -1,5 +1,5 @@
 package Util;
 
 public enum ControlFlow {
-    CLASS, FUNC, WHILE, FOR
+    CLASS, FUNC, WHILE, FOR, GLOBAL
 }

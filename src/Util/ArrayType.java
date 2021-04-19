@@ -1,12 +1,25 @@
 package Util;
 
 public class ArrayType extends ClassType {
-    Type basicType;
+    public Type basicType;
     public int dim;
+    private static String genName(int dim, Type basicType) {
+        Type t = basicType;
+        while(t instanceof ArrayType) {
+            t = ((ArrayType) t).basicType;
+            dim++;
+        }
+        return t.toString() + "$Dim" + dim;
+    }
     public ArrayType(int dim, Type basicType) {
-        super("", null); // use class "" to present array, array type will never use parent scope.
+        super(genName(dim, basicType), null);
         this.category = Category.ARRAY;
         this.dim = dim;
         this.basicType = basicType;
+    }
+    @Override
+    public boolean equals(Type rhs) {
+        if(!(rhs instanceof ArrayType)) return false;
+        return this.category == rhs.category && this.basicType.equals(((ArrayType) rhs).basicType) && this.dim == ((ArrayType) rhs).dim;
     }
 }

@@ -27,6 +27,14 @@ public class Scope {
         if(rec && parent != null) return parent.hasFunction(name, rec);
         return false;
     }
+    public int depthFunction(String name) {
+        if(functions.containsKey(name)) return 0;
+        return parent.depthFunction(name) + 1;
+    }
+    public int depthVariable(String name) {
+        if(variables.containsKey(name)) return 0;
+        return parent.depthVariable(name) + 1;
+    }
     public boolean hasVariable(String name, boolean rec) {
         if(variables.containsKey(name)) return true;
         if(rec && parent != null) return parent.hasVariable(name, rec);

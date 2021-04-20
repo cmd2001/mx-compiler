@@ -66,9 +66,9 @@ expression:
     ;
 
 creator :
-    basicType ('[' expression? ']')+                                  #arrayCreator
-    | basicType '(' ')'                                               #classCreator
-    | basicType                                                       #basicCreator
+    basicType (LeftBracket expression RightBracket)+ (LeftBracket RightBracket)*        #arrayCreator
+    | basicType '(' ')'                                                                 #classCreator
+    | basicType                                                                         #basicCreator
     ;
 
 expressionList : expression (',' expression)*;
@@ -94,9 +94,7 @@ This: 'this';
 
 fragment Digit : [0-9];
 fragment NonZeroDigit : [1-9];
-fragment EscapeCharacters : '\\\n' | '\\\\' | '\\"';
-fragment PrintableCharacters : [ -~];
-fragment Characters : EscapeCharacters | PrintableCharacters;
+fragment Characters : ~["\\\n\r] | '\\n' | '\\\\' | '\\"';
 fragment IdentifierCharacters : [a-z] | [A-Z] | [0-9] | '_';
 
 

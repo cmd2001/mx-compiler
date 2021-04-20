@@ -256,6 +256,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public ExpressionNode visitThisExpression(mxParser.ThisExpressionContext ctx) {
 		ExpressionNode ret = new ExpressionNode(new position(ctx));
 		ret.expressionType = ExpressionNode.ExpressionType.This;
+		ret.thisExpressionNode = new ThisExpressionNode(new position(ctx));
 		return ret;
 	}
 
@@ -358,6 +359,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 		ret.arrayCreator = new ArrayCreatorNode(new position(ctx));
 		ret.arrayCreator.basicType = visitBasicType(ctx.basicType());
 		for(var x: ctx.expression()) ret.arrayCreator.sizes.add((ExpressionNode) visit(x));
+		ret.arrayCreator.dim = ctx.LeftBracket().size();
 		return ret;
 	}
 

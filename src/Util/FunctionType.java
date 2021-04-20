@@ -26,4 +26,5 @@ public class FunctionType extends Type {
     }
     public FunctionType(String name, Type returnType) { super(Category.FUNC); this.name = name; this.returnType = returnType; }
     public void addArg(Variable variable) { args.put(variable.name, variable); argTypes.add(variable.type); }
+    public void replaceReturnType(Type newReturnType) { returnType = newReturnType; }
 }

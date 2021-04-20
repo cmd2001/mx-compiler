@@ -27,7 +27,9 @@ public class SemanticChecker implements ASTVisitor {
         for(CompoundStatementNode x: it.compoundStatements) if(x.isFuncDefStatement) {
             String funcName = x.functionDefNode.funcName;
             if(!gScope.checkFunctionName(funcName)) throw new syntaxError("Function name same to a class/function", x.pos());
-            gScope.defineFunction(new FunctionType(x.functionDefNode, false), x.pos());
+            FunctionType fun = new FunctionType(x.functionDefNode, false);
+            if(gScope.hasType(fun.returnType.toString())) fun.replaceReturnType(gScope.getType(fun.returnType.toString())); // replace return type when necessary.
+            gScope.defineFunction(fun, x.pos());
         }
         // push stack
         controlFlowStack.push(ControlFlow.GLOBAL);
@@ -56,10 +58,12 @@ public class SemanticChecker implements ASTVisitor {
 
         // check arguments and return type
         assert (it.argTypes.size() == it.argNames.size());
+        if(it.funcName.equals("main") && it.argTypes.size() != 0) throw new syntaxError("main function should not take any parameter", it.pos());
         for(int i = 0; i < it.argTypes.size(); i++) {
             if(gScope.hasType(it.argNames.get(i))) throw new syntaxError("Argument name same to a Class", it.pos()); // fixme: is this necessary?
             Type type = new TypeBuilder().build(it.argTypes.get(i));
             if(!(type instanceof ArrayType) && !gScope.hasType(type.toString())) throw new syntaxError("Invalid argument type " + type.toString(), it.pos());
+            // io.debug("defineing variable " + it.argNames.get(i));
             newScope.defineVariable(new Variable(type, it.argNames.get(i)), it.pos());
         }
         hasReturnedStack.push(false);
@@ -157,6 +161,7 @@ public class SemanticChecker implements ASTVisitor {
             }
             if(it.expression != null) {
                 visit(it.expression);
+                // io.debug(it.expression.valueType.toString());
                 if(!it.expression.valueType.equals(expectedReturnTypeStack.peek())) throw new syntaxError("Incorrect return type", it.pos());
                 hasReturnedStack.pop();
                 hasReturnedStack.push(true);
@@ -240,6 +245,9 @@ public class SemanticChecker implements ASTVisitor {
                 it.valueType = it.idExpressionNode.valueType;
                 it.isLeft = it.idExpressionNode.isLeft;
             }
+            default -> {
+                throw new internalError("What just happened????", new position(0, 0));
+            }
         }
     }
 
@@ -310,6 +318,13 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(MemberExpressionNode it) {
         visit(it.expression);
         Type base = it.expression.valueType;
+        /* io.debug(base.toString());
+        if(base instanceof ClassType) {
+            io.debug("functions:");
+            ((ClassType) base).printFunctions();
+            io.debug("variables:");
+            ((ClassType) base).printVariables();
+        } */
         if(!(base instanceof ClassType)) throw new syntaxError("Invalid member expression", it.pos());
         if(((ClassType) base).hasVariable(it.id, false)) {
             it.valueType = ((ClassType) base).getVariable(it.id, false).type;
@@ -370,6 +385,8 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(BinaryExpressionNode it) {
         visit(it.src1);
         visit(it.src2);
+        // io.debug(it.src1.valueType);
+        // io.debug(it.src2.valueType);
         if(!it.src1.valueType.equals(it.src2.valueType)) {
             if((it.src1.valueType instanceof ArrayType && it.src2.valueType.equals(gScope.getNullType())) ||
                     (it.src2.valueType instanceof ArrayType && it.src1.valueType.equals(gScope.getNullType()))) { // fuck null
@@ -429,25 +446,34 @@ public class SemanticChecker implements ASTVisitor {
 
     @Override
     public void visit(IdExpressionNode it) {
-        if(scopeStack.peek().hasFunction(it.id, true)) it.valueType = scopeStack.peek().getFunction(it.id, true);
-        else if(scopeStack.peek().hasVariable(it.id, true)) it.valueType = scopeStack.peek().getVariable(it.id, true).type;
-        else throw new syntaxError("invalid id expression", it.pos());
+        boolean f1 = scopeStack.peek().hasFunction(it.id, true);
+        boolean f2 = scopeStack.peek().hasVariable(it.id, true);
+        if(f1 && f2) {
+            it.valueType = scopeStack.peek().depthFunction(it.id) < scopeStack.peek().depthVariable(it.id) ? scopeStack.peek().getFunction(it.id, true) : scopeStack.peek().getVariable(it.id, true).type;
+        } else if(f1 || f2) {
+            it.valueType = f1 ? scopeStack.peek().getFunction(it.id, true) : scopeStack.peek().getVariable(it.id, true).type;
+        } else throw new syntaxError("invalid id expression", it.pos());
         it.isLeft = true;
     }
 
     @Override
     public void visit(CreatorNode it) {
         if(it.isBasicCreator || it.isClassCreator) {
-            if(!it.basicCreator.basicType.isIdentifier) throw new syntaxError("unable to create basic type with new", it.pos()); // fixme: is this necessary?
-            String id = it.basicCreator.basicType.id;
+            if(!(it.isBasicCreator ? it.basicCreator.basicType : it.classCreator.basicType).isIdentifier) throw new syntaxError("unable to create basic type with new", it.pos()); // fixme: is this necessary?
+            String id = (it.isBasicCreator ? it.basicCreator.basicType : it.classCreator.basicType).id;
             if(!gScope.hasType(id)) throw new syntaxError("invalid type" + id, it.pos());
             it.valueType = gScope.getType(id);
-            // io.debug("in creater node");
-            // io.debug(it.valueType.toString());
-            // if(it.valueType instanceof ClassType) ((ClassType) it.valueType).printFunctions();
+            /* io.debug("in creater node");
+            io.debug(it.valueType.toString());
+            if(it.valueType instanceof ClassType) {
+                io.debug("functions:");
+                ((ClassType) it.valueType).printFunctions();
+                io.debug("variables:");
+                ((ClassType) it.valueType).printVariables();
+            } */
         } else if(it.isArrayCreator) {
             Type type = new TypeBuilder().build(it.arrayCreator.basicType);
-            it.valueType = new ArrayType(it.arrayCreator.sizes.size(), type); // fixme: store sizes for codegen
+            it.valueType = new ArrayType(it.arrayCreator.dim, type); // fixme: store sizes for codegen
         }
     }
 }

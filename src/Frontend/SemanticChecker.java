@@ -355,7 +355,11 @@ public class SemanticChecker implements ASTVisitor {
         if(it.parameters.size() != ((FunctionType) func).argTypes.size()) throw new syntaxError("incorrect numbers of arguments", it.pos());
         for(int i = 0; i < it.parameters.size(); i++) {
             visit(it.parameters.get(i));
-            if(!it.parameters.get(i).valueType.equals(((FunctionType) func).argTypes.get(i))) throw new syntaxError("invalid type of parameters", it.parameters.get(i).pos());
+            var needType = ((FunctionType) func).argTypes.get(i);
+            var curType = it.parameters.get(i).valueType;
+            if(curType.equals(needType)) continue;
+            if(curType.equals(gScope.getNullType()) && needType instanceof ClassType && !(needType instanceof StringType)) continue;
+            throw new syntaxError("invalid type of parameters", it.parameters.get(i).pos());
         }
         it.valueType = ((FunctionType) func).returnType;
         it.isLeft = false;
@@ -398,9 +402,12 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(BinaryExpressionNode it) {
         visit(it.src1);
         visit(it.src2);
+        io.debug(it.src1.valueType);
+        io.debug(it.src2.valueType);
         if(!it.src1.valueType.equals(it.src2.valueType)) {
+            io.debug("Not equal");
             if((it.src1.valueType instanceof ClassType && !(it.src1.valueType instanceof StringType) && it.src2.valueType.equals(gScope.getNullType())) ||
-                    (it.src2.valueType instanceof ArrayType && !(it.src2.valueType instanceof StringType) && it.src1.valueType.equals(gScope.getNullType()))) { // fuck null
+                    (it.src2.valueType instanceof ClassType && !(it.src2.valueType instanceof StringType) && it.src1.valueType.equals(gScope.getNullType()))) { // fuck null
                 if(it.op == BinaryExpressionNode.BianryOp.Equal || it.op == BinaryExpressionNode.BianryOp.NotEqual) it.valueType = gScope.getBoolType();
                 else if(it.op == BinaryExpressionNode.BianryOp.Assign) {
                     if(it.src1.valueType instanceof ClassType) it.valueType = gScope.getNullType();
@@ -408,8 +415,7 @@ public class SemanticChecker implements ASTVisitor {
                 } else throw new syntaxError("invalid types 2 in BinaryExpression", it.pos());
             }
             else throw new syntaxError("different types in BinaryExpression", it.pos());
-        }
-        if(it.op == BinaryExpressionNode.BianryOp.Add || it.op == BinaryExpressionNode.BianryOp.Less || it.op == BinaryExpressionNode.BianryOp.LessEqual
+        } else if(it.op == BinaryExpressionNode.BianryOp.Add || it.op == BinaryExpressionNode.BianryOp.Less || it.op == BinaryExpressionNode.BianryOp.LessEqual
                 || it.op == BinaryExpressionNode.BianryOp.Greater || it.op == BinaryExpressionNode.BianryOp.GreaterEqual) {
             if(it.src1.valueType.equals(gScope.getStringType()) || it.src1.valueType.equals(gScope.getIntType())) it.valueType = it.op == BinaryExpressionNode.BianryOp.Add ? it.src1.valueType : gScope.getBoolType();
             else throw new syntaxError("invalid types 3 in BinaryExpression", it.pos());

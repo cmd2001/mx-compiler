@@ -485,7 +485,11 @@ public class SemanticChecker implements ASTVisitor {
             } */
         } else if(it.isArrayCreator) {
             Type type = new TypeBuilder().build(it.arrayCreator.basicType);
-            it.valueType = new ArrayType(it.arrayCreator.dim, type); // fixme: store sizes for codegen
+            for(ExpressionNode x: it.arrayCreator.sizes) {
+                visit(x);
+                if(!x.valueType.equals(gScope.getIntType())) throw new syntaxError("Array dim size is not int", x.pos());
+            }
+            it.valueType = new ArrayType(it.arrayCreator.dim, type);
         }
     }
 }

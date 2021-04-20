@@ -225,6 +225,13 @@ public interface mxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFuncCallExpression(mxParser.FuncCallExpressionContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code errorCreator}
+	 * labeled alternative in {@link mxParser#creator}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitErrorCreator(mxParser.ErrorCreatorContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code arrayCreator}
 	 * labeled alternative in {@link mxParser#creator}.
 	 * @param ctx the parse tree

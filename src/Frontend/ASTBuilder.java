@@ -4,6 +4,7 @@ import AST.*;
 import Parser.mxBaseVisitor;
 import Parser.mxParser;
 import Util.position;
+import Util.syntaxError;
 
 public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	@Override
@@ -350,6 +351,11 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 		ret.classCreator = new ClassCreatorNode(new position(ctx));
 		ret.classCreator.basicType = visitBasicType(ctx.basicType());
 		return ret;
+	}
+
+	@Override
+	public CreatorNode visitErrorCreator(mxParser.ErrorCreatorContext ctx) {
+		throw new syntaxError("Error creator", new position(ctx));
 	}
 
 	@Override

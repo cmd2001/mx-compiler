@@ -66,7 +66,8 @@ expression:
     ;
 
 creator :
-    basicType (LeftBracket expression RightBracket)+ (LeftBracket RightBracket)*        #arrayCreator
+    basicType ('[' expression ']')*('[' ']')+('[' expression ']')+                      #errorCreator
+    | basicType (LeftBracket expression RightBracket)+ (LeftBracket RightBracket)*      #arrayCreator
     | basicType '(' ')'                                                                 #classCreator
     | basicType                                                                         #basicCreator
     ;
@@ -95,6 +96,7 @@ This: 'this';
 fragment Digit : [0-9];
 fragment NonZeroDigit : [1-9];
 fragment Characters : ~["\\\n\r] | '\\n' | '\\\\' | '\\"';
+fragment IdentifierFirstCharacters : [a-z] | [A-Z];
 fragment IdentifierCharacters : [a-z] | [A-Z] | [0-9] | '_';
 
 
@@ -102,7 +104,7 @@ constant : logicConstant | IntConstant | StringConstant | Null;
 logicConstant : True | False;
 IntConstant : '0' | (NonZeroDigit Digit*);
 StringConstant : '"' Characters* '"';
-Identifier : IdentifierCharacters+;
+Identifier : IdentifierFirstCharacters IdentifierCharacters*;
 basicType : Int | Bool | String | Identifier;
 type : (basicType(LeftBracket RightBracket)+)  #arrayType
        | basicType                             #simpleType

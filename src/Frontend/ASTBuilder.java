@@ -65,7 +65,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public VarDefNode visitVarDef(mxParser.VarDefContext ctx) {
 		VarDefNode ret = new VarDefNode(new position(ctx));
 		ret.variableName = ctx.Identifier().getText();
-		ret.expression = (ExpressionNode) visit(ctx.expression());
+		if(ctx.expression() != null) ret.expression = (ExpressionNode) visit(ctx.expression());
 		return ret;
 	}
 
@@ -115,10 +115,10 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	}
 
 	@Override
-	public SimpleStatementNode visitBlockStatement(mxParser.BlockStatementContext ctx) {
-		SimpleStatementNode ret = new SimpleStatementNode(new position(ctx));
+	public StatementNode visitBlockStatement(mxParser.BlockStatementContext ctx) { // fixme: g4 has been changed
+		StatementNode ret = new StatementNode(new position(ctx));
 		ret.isBlock = true;
-		ret.block = visitBlock(ctx.block());
+		ret.blockNode = visitBlock(ctx.block());
 		return ret;
 	}
 
@@ -139,7 +139,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 		ret.ifNode.ifStatement = (StatementNode) visit(ctx.statement(0));
 		if(ctx.Else() != null) {
 			ret.ifNode.haveElse = true;
-			ret.ifNode.elseStatement = (StatementNode) visit(ctx.statement(0));
+			ret.ifNode.elseStatement = (StatementNode) visit(ctx.statement(1));
 		}
 		return ret;
  	}
@@ -148,7 +148,8 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public StatementNode visitWhileStatement(mxParser.WhileStatementContext ctx) {
 		StatementNode ret = new StatementNode(new position(ctx));
 		ret.isWhile = true;
-		ret.whileNode.expression = (ExpressionNode) visit(ctx.expression());
+		ret.whileNode = new WhileNode(new position(ctx));
+		if(ctx.expression() != null) ret.whileNode.expression = (ExpressionNode) visit(ctx.expression());
 		ret.whileNode.statement = (StatementNode) visit(ctx.statement());
 		return ret;
 	}
@@ -157,10 +158,11 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public StatementNode visitForStatement(mxParser.ForStatementContext ctx) {
 		StatementNode ret = new StatementNode(new position(ctx));
 		ret.isFor = true;
+		ret.forNode = new ForNode(new position(ctx));
 		if(ctx.stmt1 != null) ret.forNode.forStatement1 = (SimpleStatementNode) visit(ctx.stmt1);
 		if(ctx.stmt2 != null) ret.forNode.forStatement3 = (SimpleStatementNode) visit(ctx.stmt2);
 		ret.forNode.forStatement = (StatementNode) visit(ctx.statement());
-		ret.forNode.forExpression = (ExpressionNode) visit(ctx.condition);
+		if(ctx.condition != null) ret.forNode.forExpression = (ExpressionNode) visit(ctx.condition);
 		return ret;
 	}
 
@@ -176,6 +178,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public ExpressionNode visitBinaryExpression(mxParser.BinaryExpressionContext ctx) {
 		ExpressionNode ret = new ExpressionNode(new position(ctx));
 		ret.expressionType = ExpressionNode.ExpressionType.Binary;
+		ret.binaryExpressionNode = new BinaryExpressionNode(new position(ctx));
 		var op = ctx.op.getText();
 		ret.binaryExpressionNode.op = switch (op) {
 			case "*": yield BinaryExpressionNode.BianryOp.Mul;
@@ -208,6 +211,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public ExpressionNode visitPrefixExpression(mxParser.PrefixExpressionContext ctx) {
 		ExpressionNode ret = new ExpressionNode(new position(ctx));
 		ret.expressionType = ExpressionNode.ExpressionType.Prefix;
+		ret.prefixExpressionNode = new PrefixExpressionNode(new position(ctx));
 		var op = ctx.op.getText();
 		ret.prefixExpressionNode.op = switch (op) {
 			case "++": yield PrefixExpressionNode.PrefixOp.AddAdd;
@@ -226,6 +230,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public ExpressionNode visitIdExpression(mxParser.IdExpressionContext ctx) {
 		ExpressionNode ret = new ExpressionNode(new position(ctx));
 		ret.expressionType = ExpressionNode.ExpressionType.Id;
+		ret.idExpressionNode = new IdExpressionNode(new position(ctx));
 		ret.idExpressionNode.id = ctx.Identifier().getText();
 		return ret;
 	}
@@ -234,6 +239,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public ExpressionNode visitSubscriptExpression(mxParser.SubscriptExpressionContext ctx) {
 		ExpressionNode ret = new ExpressionNode(new position(ctx));
 		ret.expressionType = ExpressionNode.ExpressionType.Subscript;
+		ret.subscriptExpressionNode = new SubscriptExpressionNode(new position(ctx));
 		ret.subscriptExpressionNode.array = (ExpressionNode) visit(ctx.array);
 		ret.subscriptExpressionNode.index = (ExpressionNode) visit(ctx.index);
 		return ret;
@@ -250,6 +256,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public ExpressionNode visitConstExpression(mxParser.ConstExpressionContext ctx) {
 		ExpressionNode ret = new ExpressionNode(new position(ctx));
 		ret.expressionType = ExpressionNode.ExpressionType.Const;
+		ret.constExpressionNode = new ConstExpressionNode(new position(ctx));
 		var con = ctx.constant();
 		if(con.logicConstant() != null) {
 			ret.constExpressionNode.islogicConstant = true;
@@ -270,6 +277,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public ExpressionNode visitNewExpression(mxParser.NewExpressionContext ctx) {
 		ExpressionNode ret = new ExpressionNode(new position(ctx));
 		ret.expressionType = ExpressionNode.ExpressionType.New;
+		ret.newExpressionNode = new NewExpressionNode(new position(ctx));
 		ret.newExpressionNode.creator = (CreatorNode) visit(ctx.creator());
 		return ret;
 	}
@@ -278,6 +286,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public ExpressionNode visitMemberExpression(mxParser.MemberExpressionContext ctx) {
 		ExpressionNode ret = new ExpressionNode(new position(ctx));
 		ret.expressionType = ExpressionNode.ExpressionType.Member;
+		ret.memberExpressionNode = new MemberExpressionNode(new position(ctx));
 		ret.memberExpressionNode.expression = (ExpressionNode) visit(ctx.expression());
 		ret.memberExpressionNode.id = ctx.Identifier().getText();
 		return ret;
@@ -287,6 +296,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public ExpressionNode visitSubExpression(mxParser.SubExpressionContext ctx) {
 		ExpressionNode ret = new ExpressionNode(new position(ctx));
 		ret.expressionType = ExpressionNode.ExpressionType.Sub;
+		ret.subscriptExpressionNode = new SubscriptExpressionNode(new position(ctx));
 		ret.subExpressionNode.expression = (ExpressionNode) visit(ctx.expression());
 		return ret;
 	}
@@ -295,6 +305,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public ExpressionNode visitPostfixExpression(mxParser.PostfixExpressionContext ctx) {
 		ExpressionNode ret = new ExpressionNode(new position(ctx));
 		ret.expressionType = ExpressionNode.ExpressionType.Postfix;
+		ret.postfixExpressionNode = new PostfixExpressionNode(new position(ctx));
 		var op = ctx.op.getText();
 		ret.postfixExpressionNode.op = switch (op) {
 			case "++": yield PostfixExpressionNode.PostfixOp.AddAdd;
@@ -309,8 +320,9 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public ExpressionNode visitFuncCallExpression(mxParser.FuncCallExpressionContext ctx) {
 		ExpressionNode ret = new ExpressionNode(new position(ctx));
 		ret.expressionType = ExpressionNode.ExpressionType.FunCall;
+		ret.funcCallExpressionNode = new FuncCallExpressionNode(new position(ctx));
 		ret.funcCallExpressionNode.expression = (ExpressionNode) visit(ctx.expression());
-		for(var x: ctx.expressionList().expression()) ret.funcCallExpressionNode.parameters.add((ExpressionNode) visit(x));
+		if(ctx.expressionList() != null) for(var x: ctx.expressionList().expression()) ret.funcCallExpressionNode.parameters.add((ExpressionNode) visit(x));
 		return ret;
 	}
 
@@ -318,6 +330,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public CreatorNode visitBasicCreator(mxParser.BasicCreatorContext ctx) {
 		CreatorNode ret = new CreatorNode(new position(ctx));
 		ret.isBasicCreator = true;
+		ret.basicCreator = new BasicCreatorNode(new position(ctx));
 		ret.basicCreator.basicType = visitBasicType(ctx.basicType());
 		return ret;
 	}
@@ -326,6 +339,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public CreatorNode visitClassCreator(mxParser.ClassCreatorContext ctx) {
 		CreatorNode ret = new CreatorNode(new position(ctx));
 		ret.isClassCreator = true;
+		ret.classCreator = new ClassCreatorNode(new position(ctx));
 		ret.classCreator.basicType = visitBasicType(ctx.basicType());
 		return ret;
 	}
@@ -334,6 +348,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public CreatorNode visitArrayCreator(mxParser.ArrayCreatorContext ctx) {
 		CreatorNode ret = new CreatorNode(new position(ctx));
 		ret.isArrayCreator = true;
+		ret.arrayCreator = new ArrayCreatorNode(new position(ctx));
 		ret.arrayCreator.basicType = visitBasicType(ctx.basicType());
 		for(var x: ctx.expression()) ret.arrayCreator.sizes.add((ExpressionNode) visit(x));
 		return ret;

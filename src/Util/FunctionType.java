@@ -9,7 +9,7 @@ public class FunctionType extends Type {
     public String name;
     public Type returnType;
     public HashMap<String, Variable> args = new HashMap<>();
-    public ArrayList<Type> argTypes;
+    public ArrayList<Type> argTypes = new ArrayList<>();
 
     public FunctionType(FunctionDefNode defNode, boolean isConstructor) {
         super(isConstructor ? Category.CONSTRUCTOR : Category.FUNC);

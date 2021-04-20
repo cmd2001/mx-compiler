@@ -32,6 +32,7 @@ public class GlobalScope extends Scope {
         stringInstance.defineFunction(func, pos);
         func = new FunctionType("ord", intInstance);
         func.addArg(new Variable(intInstance, "pos"));
+        stringInstance.defineFunction(func, pos);
         addType("string", stringInstance, pos);
 
         // add builtin functions

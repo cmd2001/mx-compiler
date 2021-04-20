@@ -99,13 +99,6 @@ public interface mxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExpressionStatement(mxParser.ExpressionStatementContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code blockStatement}
-	 * labeled alternative in {@link mxParser#simpleStatement}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitBlockStatement(mxParser.BlockStatementContext ctx);
-	/**
 	 * Visit a parse tree produced by the {@code varStatement}
 	 * labeled alternative in {@link mxParser#simpleStatement}.
 	 * @param ctx the parse tree
@@ -140,6 +133,13 @@ public interface mxVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitContainSimpleStatement(mxParser.ContainSimpleStatementContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code blockStatement}
+	 * labeled alternative in {@link mxParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBlockStatement(mxParser.BlockStatementContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code binaryExpression}
 	 * labeled alternative in {@link mxParser#expression}.
@@ -218,12 +218,12 @@ public interface mxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFuncCallExpression(mxParser.FuncCallExpressionContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code basicCreator}
+	 * Visit a parse tree produced by the {@code arrayCreator}
 	 * labeled alternative in {@link mxParser#creator}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitBasicCreator(mxParser.BasicCreatorContext ctx);
+	T visitArrayCreator(mxParser.ArrayCreatorContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code classCreator}
 	 * labeled alternative in {@link mxParser#creator}.
@@ -232,12 +232,12 @@ public interface mxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitClassCreator(mxParser.ClassCreatorContext ctx);
 	/**
-	 * Visit a parse tree produced by the {@code arrayCreator}
+	 * Visit a parse tree produced by the {@code basicCreator}
 	 * labeled alternative in {@link mxParser#creator}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitArrayCreator(mxParser.ArrayCreatorContext ctx);
+	T visitBasicCreator(mxParser.BasicCreatorContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link mxParser#expressionList}.
 	 * @param ctx the parse tree

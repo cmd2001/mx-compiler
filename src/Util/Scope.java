@@ -52,4 +52,7 @@ public class Scope {
         return constructor;
     }
     public Scope getParent() { return parent; }
+
+    public void printFunctions() { for(String x: functions.keySet()) io.debug(x); }
+    public void printVariables() { for(String x: variables.keySet()) io.debug(x); }
 }

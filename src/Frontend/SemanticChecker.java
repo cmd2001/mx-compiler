@@ -8,6 +8,7 @@ import java.util.Stack;
 public class SemanticChecker implements ASTVisitor {
     Stack<ControlFlow> controlFlowStack = new Stack<>();
     Stack<Type> expectedReturnTypeStack = new Stack<>();
+    Stack<Boolean> hasReturnedStack = new Stack<>();
     Stack<Scope> scopeStack = new Stack<>();
     Stack<String> currentClassStack = new Stack<>();
     GlobalScope gScope = new GlobalScope();
@@ -33,6 +34,10 @@ public class SemanticChecker implements ASTVisitor {
         scopeStack.push(gScope);
         // visit compoundStatements
         for(CompoundStatementNode x: it.compoundStatements) visit(x);
+
+        // check main
+        if(!gScope.hasFunction("main", false)) throw new syntaxError("main function not found", new position(0, 0));
+        if(!gScope.getFunction("main", false).returnType.equals(gScope.getIntType())) throw new syntaxError("invalid main function", new position(0, 0));
     }
 
     @Override
@@ -54,22 +59,25 @@ public class SemanticChecker implements ASTVisitor {
         for(int i = 0; i < it.argTypes.size(); i++) {
             if(gScope.hasType(it.argNames.get(i))) throw new syntaxError("Argument name same to a Class", it.pos()); // fixme: is this necessary?
             Type type = new TypeBuilder().build(it.argTypes.get(i));
-            if(!gScope.hasType(type.toString())) throw new syntaxError("Invalid argument type " + type.toString(), it.pos());
+            if(!(type instanceof ArrayType) && !gScope.hasType(type.toString())) throw new syntaxError("Invalid argument type " + type.toString(), it.pos());
             newScope.defineVariable(new Variable(type, it.argNames.get(i)), it.pos());
         }
         if(!it.isVoid) {
             Type returnType = new TypeBuilder().build(it.returnType);
-            if (!gScope.hasType(returnType.toString())) throw new syntaxError("Invalid return type " + returnType.toString(), it.pos());
+            if (!(returnType instanceof ArrayType) && !gScope.hasType(returnType.toString())) throw new syntaxError("Invalid return type " + returnType.toString(), it.pos());
             expectedReturnTypeStack.push(returnType);
+            hasReturnedStack.push(false);
         } else expectedReturnTypeStack.push(gScope.getVoidType());
 
         // visit function body
         visit(it.funcBody);
+        if(!it.funcName.equals("main") && !hasReturnedStack.peek()) throw new syntaxError("No return value in non-void function", it.pos());
 
         // pop stack
         scopeStack.pop();
         controlFlowStack.pop();
         expectedReturnTypeStack.pop();
+        hasReturnedStack.pop();
     }
 
     @Override
@@ -78,6 +86,7 @@ public class SemanticChecker implements ASTVisitor {
         if(it.isFor) visit(it.forNode);
         if(it.isWhile) visit(it.whileNode);
         if(it.isSimpleStatement) visit(it.simpleStatement);
+        if(it.isBlock) visit(it.blockNode);
     }
 
     @Override
@@ -92,7 +101,7 @@ public class SemanticChecker implements ASTVisitor {
         // check definition
         for(VarDefStatementNode x: it.variables) {
             Type type = new TypeBuilder().build(x.type);
-            if(!gScope.hasType(type.toString())) throw new syntaxError("Invalid type " + type.toString(), x.pos());
+            if(!(type instanceof ArrayType) && !gScope.hasType(type.toString())) throw new syntaxError("Invalid type " + type.toString(), x.pos());
             for(VarDefNode v: x.variables) {
                 if(v.expression != null) throw new syntaxError("Assigning value when defining variable in class is INVALID", it.pos());
                 if(newScope.hasVariable(v.variableName, false)) throw new syntaxError("Variable defined twice in Class", it.pos());
@@ -149,6 +158,8 @@ public class SemanticChecker implements ASTVisitor {
             if(it.expression != null) {
                 visit(it.expression);
                 if(!it.expression.valueType.equals(expectedReturnTypeStack.peek())) throw new syntaxError("Incorrect return type", it.pos());
+                hasReturnedStack.pop();
+                hasReturnedStack.push(true);
             } else if(!expectedReturnTypeStack.peek().equals(gScope.getVoidType())) throw new syntaxError("Incorrect return type", it.pos());
         } else if(it.isBreak) {
             if(controlFlowStack.peek() != ControlFlow.FOR && controlFlowStack.peek() != ControlFlow.WHILE) throw new syntaxError("Break out of a loop", it.pos());
@@ -156,17 +167,17 @@ public class SemanticChecker implements ASTVisitor {
             if(controlFlowStack.peek() != ControlFlow.FOR && controlFlowStack.peek() != ControlFlow.WHILE) throw new syntaxError("Break out of a loop", it.pos());
         } else if(it.isExpression) {
             visit(it.expression);
-        } else if(it.isBlock) {
-            visit(it.block);
         }
     }
 
     @Override
     public void visit(VarDefStatementNode it) {
         Type type = new TypeBuilder().build(it.type);
-        if(!gScope.hasType(type.toString())) throw new syntaxError("Invalid return type " + type.toString(), it.pos());
+        if(!(type instanceof ArrayType) && !gScope.hasType(type.toString())) throw new syntaxError("Invalid variable type " + type.toString(), it.pos());
+        type = gScope.getType(type.toString());
         for(VarDefNode t: it.variables) {
             if(t.expression != null) visit(t.expression);
+            // if(type instanceof ClassType) ((ClassType) type).printFunctions();
             scopeStack.peek().defineVariable(new Variable(type, t.variableName), t.pos());
         }
     }
@@ -285,8 +296,12 @@ public class SemanticChecker implements ASTVisitor {
     @Override
     public void visit(MemberExpressionNode it) {
         visit(it.expression);
-        Type base = gScope.getType(it.expression.valueType.toString());
-        if(!(base instanceof ClassType) || (base instanceof ArrayType)) throw new syntaxError("Invalid member expression", it.pos());
+        Type base = it.expression.valueType;
+        /* io.debug(base.toString());
+        io.debug(String.valueOf(base instanceof ClassType));
+        io.debug(it.id);
+        ((ClassType) base).printFunctions(); */
+        if(!(base instanceof ClassType)) throw new syntaxError("Invalid member expression", it.pos());
         if(((ClassType) base).hasVariable(it.id, false)) it.valueType = ((ClassType) base).getVariable(it.id, false).type;
         else if(((ClassType) base).hasFunction(it.id, false)) it.valueType = ((ClassType) base).getFunction(it.id, false);
         else throw new syntaxError("Member " + it.id + " does not exist in class " + base.toString(), it.pos());
@@ -300,7 +315,7 @@ public class SemanticChecker implements ASTVisitor {
         if(it.parameters.size() != ((FunctionType) func).argTypes.size()) throw new syntaxError("incorrect numbers of arguments", it.pos());
         for(int i = 0; i < it.parameters.size(); i++) {
             visit(it.parameters.get(i));
-            if(it.parameters.get(i).valueType.equals(((FunctionType) func).argTypes.get(i))) throw new syntaxError("invalid type of parameters", it.parameters.get(i).pos());
+            if(!it.parameters.get(i).valueType.equals(((FunctionType) func).argTypes.get(i))) throw new syntaxError("invalid type of parameters", it.parameters.get(i).pos());
         }
         it.valueType = ((FunctionType) func).returnType;
     }
@@ -333,6 +348,8 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(BinaryExpressionNode it) {
         visit(it.src1);
         visit(it.src2);
+        // io.debug(it.src1.valueType.toString());
+        // io.debug(it.src2.valueType.toString());
         if(!it.src1.valueType.equals(it.src2.valueType)) {
             if((it.src1.valueType instanceof ArrayType && it.src2.valueType.equals(gScope.getNullType())) ||
                     (it.src2.valueType instanceof ArrayType && it.src1.valueType.equals(gScope.getNullType()))) { // fuck null
@@ -354,13 +371,13 @@ public class SemanticChecker implements ASTVisitor {
         } else if(it.op == BinaryExpressionNode.BianryOp.Sub || it.op == BinaryExpressionNode.BianryOp.Mul || it.op == BinaryExpressionNode.BianryOp.Div ||
                 it.op == BinaryExpressionNode.BianryOp.Mod || it.op == BinaryExpressionNode.BianryOp.ShL || it.op == BinaryExpressionNode.BianryOp.ShR ||
                 it.op == BinaryExpressionNode.BianryOp.And || it.op == BinaryExpressionNode.BianryOp.Xor || it.op == BinaryExpressionNode.BianryOp.Or) {
-            if(it.src1.valueType.equals(gScope.getIntType())) it.valueType = gScope.getBoolType();
+            if(it.src1.valueType.equals(gScope.getIntType())) it.valueType = gScope.getIntType();
             else throw new syntaxError("invalid types 5 in BinaryExpression", it.pos());
         } else if(it.op == BinaryExpressionNode.BianryOp.AndAnd || it.op == BinaryExpressionNode.BianryOp.OrOr) {
             if(it.src1.valueType.equals(gScope.getBoolType())) it.valueType = gScope.getBoolType();
             else throw new syntaxError("invalid types 6 in BinaryExpression", it.pos());
         } else if(it.op == BinaryExpressionNode.BianryOp.Assign) it.valueType = it.src1.valueType; // fixme: restrict type
-        throw new internalError("This should not happen in visit BinaryNode", new position(0, 0));
+        else throw new internalError("This should not happen in visit BinaryNode", new position(0, 0));
     }
 
     @Override
@@ -387,19 +404,25 @@ public class SemanticChecker implements ASTVisitor {
     @Override
     public void visit(IdExpressionNode it) {
         if(scopeStack.peek().hasFunction(it.id, true)) it.valueType = scopeStack.peek().getFunction(it.id, true);
-        else if(scopeStack.peek().hasVariable(it.id, true)) it.valueType = scopeStack.peek().getVariable(it.id, true).type;
+        else if(scopeStack.peek().hasVariable(it.id, true)) {
+            it.valueType = scopeStack.peek().getVariable(it.id, true).type;
+            // io.debug("in idexp node");
+            // io.debug(it.valueType.toString());
+            // if(it.valueType instanceof ClassType) ((ClassType) it.valueType).printFunctions();
+        }
         else throw new syntaxError("invalid id expression", it.pos());
     }
 
     @Override
     public void visit(CreatorNode it) {
-        if(it.isBasicCreator) {
-            throw new syntaxError("unable to create basic type with new", it.pos()); // fixme: is this necessary?
-        } else if(it.isClassCreator) {
-            if(!it.basicCreator.basicType.isIdentifier) throw new syntaxError("unable to create basic type with new", it.pos());
+        if(it.isBasicCreator || it.isClassCreator) {
+            if(!it.basicCreator.basicType.isIdentifier) throw new syntaxError("unable to create basic type with new", it.pos()); // fixme: is this necessary?
             String id = it.basicCreator.basicType.id;
             if(!gScope.hasType(id)) throw new syntaxError("invalid type" + id, it.pos());
             it.valueType = gScope.getType(id);
+            // io.debug("in creater node");
+            // io.debug(it.valueType.toString());
+            // if(it.valueType instanceof ClassType) ((ClassType) it.valueType).printFunctions();
         } else if(it.isArrayCreator) {
             Type type = new TypeBuilder().build(it.arrayCreator.basicType);
             it.valueType = new ArrayType(it.arrayCreator.sizes.size(), type); // fixme: store sizes for codegen

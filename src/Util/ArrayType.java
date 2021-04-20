@@ -16,6 +16,7 @@ public class ArrayType extends ClassType {
         this.category = Category.ARRAY;
         this.dim = dim;
         this.basicType = basicType;
+        defineFunction(new FunctionType("size", new BasicType(Category.INT)), new position(0, 0));
     }
     @Override
     public boolean equals(Type rhs) {

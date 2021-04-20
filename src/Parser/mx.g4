@@ -23,19 +23,19 @@ constructFuncDefStatement : Identifier '(' ')' block;
 block : '{' statement* '}';
 
 simpleStatement:
-    Return expression?                                                          #returnStatement
-    | Break                                                                     #breakStatement
-    | Continue                                                                  #continueStatement
-    | expression                                                                #expressionStatement
-    | block                                                                     #blockStatement
-    | varDefStatement                                                           #varStatement
+    Return expression?                                                         #returnStatement
+    | Break                                                                    #breakStatement
+    | Continue                                                                 #continueStatement
+    | expression                                                               #expressionStatement
+    | varDefStatement                                                          #varStatement
     ;
 
 statement :
       If '(' expression ')' statement (Else statement) ?                                                  #ifStatement
     | While '(' expression? ')' statement                                                                 #whileStatement
     | For '(' stmt1=simpleStatement? ';' condition=expression ';' stmt2=simpleStatement? ')' statement    #forStatement
-    | simpleStatement ';'                                                                                 #containSimpleStatement
+    | simpleStatement  ';'                                                                                #containSimpleStatement
+    | block                                                                                               #blockStatement
     ;
 
 expression:
@@ -65,9 +65,9 @@ expression:
     ;
 
 creator :
-    basicType                                                         #basicCreator
+    basicType ('[' expression? ']')+                                  #arrayCreator
     | basicType '(' ')'                                               #classCreator
-    | basicType ('[' expression? ']')+                                #arrayCreator
+    | basicType                                                       #basicCreator
     ;
 
 expressionList : expression (',' expression)*;

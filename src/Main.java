@@ -18,7 +18,7 @@ import java.io.InputStream;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        // InputStream input = new FileInputStream("/Users/xzy/Desktop/Compiler-2021-testcases/sema/array-package/array-10.mx");
+        // InputStream input = new FileInputStream("/Users/xzy/Desktop/Compiler-2021-testcases/sema/misc-package/misc-12.mx");
         InputStream input = System.in;
         try {
             mxLexer lexer = new mxLexer(CharStreams.fromStream(input));

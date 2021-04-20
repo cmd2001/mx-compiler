@@ -400,11 +400,11 @@ public class SemanticChecker implements ASTVisitor {
         visit(it.src1);
         visit(it.src2);
         if(!it.src1.valueType.equals(it.src2.valueType)) {
-            if((it.src1.valueType instanceof ArrayType && it.src2.valueType.equals(gScope.getNullType())) ||
-                    (it.src2.valueType instanceof ArrayType && it.src1.valueType.equals(gScope.getNullType()))) { // fuck null
+            if((it.src1.valueType instanceof ClassType && !(it.src1.valueType instanceof StringType) && it.src2.valueType.equals(gScope.getNullType())) ||
+                    (it.src2.valueType instanceof ArrayType && !(it.src2.valueType instanceof StringType) && it.src1.valueType.equals(gScope.getNullType()))) { // fuck null
                 if(it.op == BinaryExpressionNode.BianryOp.Equal || it.op == BinaryExpressionNode.BianryOp.NotEqual) it.valueType = gScope.getBoolType();
                 else if(it.op == BinaryExpressionNode.BianryOp.Assign) {
-                    if(it.src1.valueType instanceof ArrayType) it.valueType = gScope.getNullType();
+                    if(it.src1.valueType instanceof ClassType) it.valueType = gScope.getNullType();
                     else throw new syntaxError("invalid types 1 in BinaryExpression", it.pos());
                 } else throw new syntaxError("invalid types 2 in BinaryExpression", it.pos());
             }

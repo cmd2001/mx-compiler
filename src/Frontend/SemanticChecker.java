@@ -174,7 +174,7 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(VarDefStatementNode it) {
         Type type = new TypeBuilder().build(it.type);
         if(!(type instanceof ArrayType) && !gScope.hasType(type.toString())) throw new syntaxError("Invalid variable type " + type.toString(), it.pos());
-        type = gScope.getType(type.toString());
+        if(!(type instanceof ArrayType)) type = gScope.getType(type.toString());
         for(VarDefNode t: it.variables) {
             if(t.expression != null) visit(t.expression);
             // if(type instanceof ClassType) ((ClassType) type).printFunctions();

@@ -42,7 +42,7 @@ public class SemanticChecker implements ASTVisitor {
                 if(x.funcName.equals(a.classDefNode.className)) throw new syntaxError("Invalid construction function", x.pos());
                 // no need to check arguments type and name, this will be done when visiting function.
                 FunctionType func = new FunctionType(x, false);
-                func.returnType = gScope.getType(func.returnType.toString()); // link it to glocal type
+                if(!(func.returnType instanceof ArrayType)) func.returnType = gScope.getType(func.returnType.toString()); // link it to glocal type
                 curClass.defineFunction(func, x.pos());
             }
             for(ConstructFunctionDefNode t: a.classDefNode.constructFunctions) {

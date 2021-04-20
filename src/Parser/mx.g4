@@ -33,7 +33,7 @@ simpleStatement:
 statement :
       If '(' expression ')' statement (Else statement) ?                                                  #ifStatement
     | While '(' expression? ')' statement                                                                 #whileStatement
-    | For '(' stmt1=simpleStatement? ';' condition=expression ';' stmt2=simpleStatement? ')' statement    #forStatement
+    | For '(' stmt1=simpleStatement? ';' condition=expression? ';' stmt2=simpleStatement? ')' statement    #forStatement
     | simpleStatement  ';'                                                                                #containSimpleStatement
     | block                                                                                               #blockStatement
     | ';'                                                                                                 #emptyStatement

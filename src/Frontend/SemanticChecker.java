@@ -280,29 +280,40 @@ public class SemanticChecker implements ASTVisitor {
             visit(it.expression);
             if(!it.expression.valueType.equals(gScope.getBoolType())) throw new syntaxError("While condition is not boolean", it.expression.pos());
         }
+
+        scopeStack.push(new Scope(scopeStack.peek()));
+        controlFlowStack.push(ControlFlow.WHILE);
+        visit(it.statement);
+        scopeStack.pop();
+        controlFlowStack.pop();
     }
 
     @Override
     public void visit(ForNode it) {
         scopeStack.push(new Scope(scopeStack.peek()));
+        controlFlowStack.push(ControlFlow.FOR);
 
         if(it.forStatement1 != null) { // fixme: restrict statement type.
             visit(it.forStatement1);
         }
-        visit(it.forExpression);
-        if(!it.forExpression.valueType.equals(gScope.getBoolType())) throw new syntaxError("For condition is not boolean", it.forExpression.pos());
+        if(it.forExpression != null) {
+            visit(it.forExpression);
+            if (!it.forExpression.valueType.equals(gScope.getBoolType())) throw new syntaxError("For condition is not boolean", it.forExpression.pos());
+        }
         if(it.forStatement3 != null) { // fixme: restrict statement type.
             visit(it.forStatement3);
         }
         visit(it.forStatement);
 
         scopeStack.pop();
+        controlFlowStack.pop();
     }
 
     @Override
     public void visit(PostfixExpressionNode it) {
         visit(it.expression);
         if(!it.expression.valueType.equals(gScope.getIntType())) throw new syntaxError("PostfixExpression with none-int type", it.pos());
+        if(!it.expression.isLeft) throw new syntaxError("invalid left value for ?++", it.pos());
         it.valueType = gScope.getIntType();
         it.isLeft = false;
     }
@@ -378,15 +389,16 @@ public class SemanticChecker implements ASTVisitor {
                 throw new syntaxError("~ PrefixExpression with none-boolean type", it.pos());
             it.valueType = gScope.getBoolType();
         }
-        it.isLeft = it.op == PrefixExpressionNode.PrefixOp.AddAdd || it.op == PrefixExpressionNode.PrefixOp.SubSub;
+        if(it.op == PrefixExpressionNode.PrefixOp.AddAdd || it.op == PrefixExpressionNode.PrefixOp.SubSub) {
+            if(!it.expression.isLeft) throw new syntaxError("invalid left value for ++?", it.pos());
+            it.isLeft = true;
+        } else it.isLeft = false;
     }
 
     @Override
     public void visit(BinaryExpressionNode it) {
         visit(it.src1);
         visit(it.src2);
-        // io.debug(it.src1.valueType);
-        // io.debug(it.src2.valueType);
         if(!it.src1.valueType.equals(it.src2.valueType)) {
             if((it.src1.valueType instanceof ArrayType && it.src2.valueType.equals(gScope.getNullType())) ||
                     (it.src2.valueType instanceof ArrayType && it.src1.valueType.equals(gScope.getNullType()))) { // fuck null
@@ -403,7 +415,7 @@ public class SemanticChecker implements ASTVisitor {
             if(it.src1.valueType.equals(gScope.getStringType()) || it.src1.valueType.equals(gScope.getIntType())) it.valueType = it.op == BinaryExpressionNode.BianryOp.Add ? it.src1.valueType : gScope.getBoolType();
             else throw new syntaxError("invalid types 3 in BinaryExpression", it.pos());
         } else if(it.op == BinaryExpressionNode.BianryOp.Equal || it.op == BinaryExpressionNode.BianryOp.NotEqual) {
-            if(it.src1.valueType.equals(gScope.getStringType()) || it.src1.valueType.equals(gScope.getIntType()) || it.src1.valueType.equals(gScope.getBoolType())) it.valueType = gScope.getBoolType();
+            if(it.src1.valueType.equals(gScope.getStringType()) || it.src1.valueType.equals(gScope.getIntType()) || it.src1.valueType.equals(gScope.getBoolType()) || it.src1.valueType.equals(gScope.getNullType())) it.valueType = gScope.getBoolType();
             else throw new syntaxError("invalid types 4 in BinaryExpression", it.pos());
         } else if(it.op == BinaryExpressionNode.BianryOp.Sub || it.op == BinaryExpressionNode.BianryOp.Mul || it.op == BinaryExpressionNode.BianryOp.Div ||
                 it.op == BinaryExpressionNode.BianryOp.Mod || it.op == BinaryExpressionNode.BianryOp.ShL || it.op == BinaryExpressionNode.BianryOp.ShR ||

@@ -6,6 +6,7 @@ import Util.position;
 public class SubExpressionNode extends ASTNode {
     public ExpressionNode expression;
     public Type valueType;
+    public boolean isLeft;
 
     public SubExpressionNode(position pos) {
         super(pos);

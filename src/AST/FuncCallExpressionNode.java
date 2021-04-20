@@ -9,6 +9,7 @@ public class FuncCallExpressionNode extends ASTNode {
     public ExpressionNode expression;
     public ArrayList<ExpressionNode> parameters = new ArrayList<>();
     public Type valueType;
+    public boolean isLeft;
 
     public FuncCallExpressionNode(position pos) {
         super(pos);

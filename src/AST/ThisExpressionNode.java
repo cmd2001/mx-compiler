@@ -5,6 +5,8 @@ import Util.position;
 
 public class ThisExpressionNode extends ASTNode {
     public Type valueType;
+    public boolean isLeft;
+
     public ThisExpressionNode(position pos) {
         super(pos);
     }

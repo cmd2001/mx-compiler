@@ -6,6 +6,7 @@ import Util.position;
 public class IdExpressionNode extends ASTNode {
     public String id;
     public Type valueType;
+    public boolean isLeft;
 
     public IdExpressionNode(position pos) {
         super(pos);

@@ -9,6 +9,7 @@ public class ConstExpressionNode extends ASTNode {
     public int intConstant;
     public String stringConstant;
     public Type valueType;
+    public boolean isLeft;
 
     public ConstExpressionNode(position pos) {
         super(pos);

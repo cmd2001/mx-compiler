@@ -7,6 +7,7 @@ public class MemberExpressionNode extends ASTNode {
     public ExpressionNode expression;
     public String id;
     public Type valueType;
+    public boolean isLeft;
 
     public MemberExpressionNode(position pos) {
         super(pos);

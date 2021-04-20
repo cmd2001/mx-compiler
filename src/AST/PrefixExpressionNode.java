@@ -8,6 +8,7 @@ public class PrefixExpressionNode extends ASTNode {
     public PrefixOp op = PrefixOp.None;
     public ExpressionNode expression;
     public Type valueType;
+    public boolean isLeft;
 
     public PrefixExpressionNode(position pos) {
         super(pos);

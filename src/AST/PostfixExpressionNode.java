@@ -8,6 +8,7 @@ public class PostfixExpressionNode extends ASTNode {
     public PostfixOp op = PostfixOp.None;
     public ExpressionNode expression;
     public Type valueType;
+    public boolean isLeft;
 
     public PostfixExpressionNode(position pos) {
         super(pos);

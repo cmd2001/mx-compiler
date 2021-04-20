@@ -188,46 +188,57 @@ public class SemanticChecker implements ASTVisitor {
             case Postfix -> {
                 visit(it.postfixExpressionNode);
                 it.valueType = it.postfixExpressionNode.valueType;
+                it.isLeft = it.postfixExpressionNode.isLeft;
             }
             case New -> {
                 visit(it.newExpressionNode);
                 it.valueType = it.newExpressionNode.valueType;
+                it.isLeft = it.newExpressionNode.isLeft;
             }
             case Member -> {
                 visit(it.memberExpressionNode);
                 it.valueType = it.memberExpressionNode.valueType;
+                it.isLeft = it.memberExpressionNode.isLeft;
             }
             case FunCall -> {
                 visit(it.funcCallExpressionNode);
                 it.valueType = it.funcCallExpressionNode.valueType;
+                it.isLeft = it.funcCallExpressionNode.isLeft;
             }
             case Subscript -> {
                 visit(it.subscriptExpressionNode);
                 it.valueType = it.subscriptExpressionNode.valueType;
+                it.isLeft = it.subscriptExpressionNode.isLeft;
             }
             case Prefix -> {
                 visit(it.prefixExpressionNode);
                 it.valueType = it.prefixExpressionNode.valueType;
+                it.isLeft = it.prefixExpressionNode.isLeft;
             }
             case Binary -> {
                 visit(it.binaryExpressionNode);
                 it.valueType = it.binaryExpressionNode.valueType;
+                it.isLeft = it.binaryExpressionNode.isLeft;
             }
             case Sub -> {
                 visit(it.subExpressionNode);
                 it.valueType = it.subExpressionNode.valueType;
+                it.isLeft = it.subscriptExpressionNode.isLeft;
             }
             case This -> {
                 visit(it.thisExpressionNode);
                 it.valueType = it.thisExpressionNode.valueType;
+                it.isLeft = it.thisExpressionNode.isLeft;
             }
             case Const -> {
                 visit(it.constExpressionNode);
                 it.valueType = it.constExpressionNode.valueType;
+                it.isLeft = it.constExpressionNode.isLeft;
             }
             case Id -> {
                 visit(it.idExpressionNode);
                 it.valueType = it.idExpressionNode.valueType;
+                it.isLeft = it.idExpressionNode.isLeft;
             }
         }
     }
@@ -285,25 +296,29 @@ public class SemanticChecker implements ASTVisitor {
         visit(it.expression);
         if(!it.expression.valueType.equals(gScope.getIntType())) throw new syntaxError("PostfixExpression with none-int type", it.pos());
         it.valueType = gScope.getIntType();
+        it.isLeft = false;
     }
 
     @Override
     public void visit(NewExpressionNode it) {
         visit(it.creator);
         it.valueType = it.creator.valueType;
+        it.isLeft = false;
     }
 
     @Override
     public void visit(MemberExpressionNode it) {
         visit(it.expression);
         Type base = it.expression.valueType;
-        /* io.debug(base.toString());
-        io.debug(String.valueOf(base instanceof ClassType));
-        io.debug(it.id);
-        ((ClassType) base).printFunctions(); */
         if(!(base instanceof ClassType)) throw new syntaxError("Invalid member expression", it.pos());
-        if(((ClassType) base).hasVariable(it.id, false)) it.valueType = ((ClassType) base).getVariable(it.id, false).type;
-        else if(((ClassType) base).hasFunction(it.id, false)) it.valueType = ((ClassType) base).getFunction(it.id, false);
+        if(((ClassType) base).hasVariable(it.id, false)) {
+            it.valueType = ((ClassType) base).getVariable(it.id, false).type;
+            it.isLeft = true;
+        }
+        else if(((ClassType) base).hasFunction(it.id, false)) {
+            it.valueType = ((ClassType) base).getFunction(it.id, false);
+            it.isLeft = false;
+        }
         else throw new syntaxError("Member " + it.id + " does not exist in class " + base.toString(), it.pos());
     }
 
@@ -318,6 +333,7 @@ public class SemanticChecker implements ASTVisitor {
             if(!it.parameters.get(i).valueType.equals(((FunctionType) func).argTypes.get(i))) throw new syntaxError("invalid type of parameters", it.parameters.get(i).pos());
         }
         it.valueType = ((FunctionType) func).returnType;
+        it.isLeft = false;
     }
 
     @Override
@@ -332,6 +348,7 @@ public class SemanticChecker implements ASTVisitor {
             if(!gScope.hasType(type)) throw new internalError("Basic type not found after decleration???", it.pos());
             it.valueType = gScope.getType(type);
         } else it.valueType = new ArrayType(((ArrayType) array).dim - 1, ((ArrayType) array).basicType);
+        it.isLeft = true;
     }
 
     @Override
@@ -346,14 +363,13 @@ public class SemanticChecker implements ASTVisitor {
                 throw new syntaxError("~ PrefixExpression with none-boolean type", it.pos());
             it.valueType = gScope.getBoolType();
         }
+        it.isLeft = it.op == PrefixExpressionNode.PrefixOp.AddAdd || it.op == PrefixExpressionNode.PrefixOp.SubSub;
     }
 
     @Override
     public void visit(BinaryExpressionNode it) {
         visit(it.src1);
         visit(it.src2);
-        // io.debug(it.src1.valueType.toString());
-        // io.debug(it.src2.valueType.toString());
         if(!it.src1.valueType.equals(it.src2.valueType)) {
             if((it.src1.valueType instanceof ArrayType && it.src2.valueType.equals(gScope.getNullType())) ||
                     (it.src2.valueType instanceof ArrayType && it.src1.valueType.equals(gScope.getNullType()))) { // fuck null
@@ -380,14 +396,18 @@ public class SemanticChecker implements ASTVisitor {
         } else if(it.op == BinaryExpressionNode.BianryOp.AndAnd || it.op == BinaryExpressionNode.BianryOp.OrOr) {
             if(it.src1.valueType.equals(gScope.getBoolType())) it.valueType = gScope.getBoolType();
             else throw new syntaxError("invalid types 6 in BinaryExpression", it.pos());
-        } else if(it.op == BinaryExpressionNode.BianryOp.Assign) it.valueType = it.src1.valueType; // fixme: restrict type
-        else throw new internalError("This should not happen in visit BinaryNode", new position(0, 0));
+        } else if(it.op == BinaryExpressionNode.BianryOp.Assign) {
+            if(!it.src1.isLeft) throw new syntaxError("invalid left value in BinaryExpression", it.src1.pos());
+            it.valueType = it.src1.valueType; // fixme: restrict type
+        } else throw new internalError("This should not happen in visit BinaryNode", new position(0, 0));
+        it.isLeft = false;
     }
 
     @Override
     public void visit(SubExpressionNode it) {
         visit(it.expression);
         it.valueType = it.expression.valueType;
+        it.isLeft = it.expression.isLeft;
     }
 
     @Override
@@ -395,6 +415,7 @@ public class SemanticChecker implements ASTVisitor {
         if(currentClassStack.empty()) throw new syntaxError("invalid this expression", it.pos());
         assert(gScope.hasType(currentClassStack.peek()));
         it.valueType = gScope.getType(currentClassStack.peek());
+        it.isLeft = false;
     }
 
     @Override
@@ -403,18 +424,15 @@ public class SemanticChecker implements ASTVisitor {
         if(it.isStringConstant) it.valueType = gScope.getStringType();
         if(it.islogicConstant) it.valueType = gScope.getBoolType();
         if(it.isIntConstant) it.valueType = gScope.getIntType();
+        it.isLeft = false;
     }
 
     @Override
     public void visit(IdExpressionNode it) {
         if(scopeStack.peek().hasFunction(it.id, true)) it.valueType = scopeStack.peek().getFunction(it.id, true);
-        else if(scopeStack.peek().hasVariable(it.id, true)) {
-            it.valueType = scopeStack.peek().getVariable(it.id, true).type;
-            // io.debug("in idexp node");
-            // io.debug(it.valueType.toString());
-            // if(it.valueType instanceof ClassType) ((ClassType) it.valueType).printFunctions();
-        }
+        else if(scopeStack.peek().hasVariable(it.id, true)) it.valueType = scopeStack.peek().getVariable(it.id, true).type;
         else throw new syntaxError("invalid id expression", it.pos());
+        it.isLeft = true;
     }
 
     @Override

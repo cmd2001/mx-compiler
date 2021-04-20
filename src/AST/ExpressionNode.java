@@ -8,6 +8,7 @@ public class ExpressionNode extends ASTNode {
 
     public ExpressionType expressionType = ExpressionType.None;
     public Type valueType;
+    public boolean isLeft;
 
     public PostfixExpressionNode postfixExpressionNode;
     public NewExpressionNode newExpressionNode;

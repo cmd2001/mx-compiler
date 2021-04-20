@@ -8,6 +8,7 @@ public class BinaryExpressionNode extends ASTNode {
     public BianryOp op;
     public ExpressionNode src1, src2;
     public Type valueType;
+    public boolean isLeft;
 
     public BinaryExpressionNode(position pos) {
         super(pos);

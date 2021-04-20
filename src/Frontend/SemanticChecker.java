@@ -337,11 +337,12 @@ public class SemanticChecker implements ASTVisitor {
         if(it.op != PrefixExpressionNode.PrefixOp.Not) {
             if (!it.expression.valueType.equals(gScope.getIntType()))
                 throw new syntaxError("None-! PrefixExpression with none-int type", it.pos());
+            it.valueType = gScope.getIntType();
         } else {
             if (!it.expression.valueType.equals(gScope.getBoolType()))
                 throw new syntaxError("~ PrefixExpression with none-boolean type", it.pos());
+            it.valueType = gScope.getBoolType();
         }
-        it.valueType = gScope.getIntType();
     }
 
     @Override

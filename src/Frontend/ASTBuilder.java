@@ -165,7 +165,6 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 		if(ctx.condition != null) ret.forNode.forExpression = (ExpressionNode) visit(ctx.condition);
 		return ret;
 	}
-
 	@Override
 	public StatementNode visitContainSimpleStatement(mxParser.ContainSimpleStatementContext ctx) {
 		StatementNode ret = new StatementNode(new position(ctx));
@@ -173,6 +172,14 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 		ret.simpleStatement = (SimpleStatementNode) visit(ctx.simpleStatement());
 		return ret;
 	}
+
+	@Override
+	public StatementNode visitEmptyStatement(mxParser.EmptyStatementContext ctx) {
+		StatementNode ret = new StatementNode(new position(ctx));
+		ret.isEmpty = true;
+		return ret;
+	}
+
 
 	@Override
 	public ExpressionNode visitBinaryExpression(mxParser.BinaryExpressionContext ctx) {

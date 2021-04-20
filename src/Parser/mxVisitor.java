@@ -141,6 +141,13 @@ public interface mxVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitBlockStatement(mxParser.BlockStatementContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code emptyStatement}
+	 * labeled alternative in {@link mxParser#statement}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEmptyStatement(mxParser.EmptyStatementContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code binaryExpression}
 	 * labeled alternative in {@link mxParser#expression}.
 	 * @param ctx the parse tree

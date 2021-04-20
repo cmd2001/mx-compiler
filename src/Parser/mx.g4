@@ -36,6 +36,7 @@ statement :
     | For '(' stmt1=simpleStatement? ';' condition=expression ';' stmt2=simpleStatement? ')' statement    #forStatement
     | simpleStatement  ';'                                                                                #containSimpleStatement
     | block                                                                                               #blockStatement
+    | ';'                                                                                                 #emptyStatement
     ;
 
 expression:

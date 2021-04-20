@@ -62,11 +62,11 @@ public class SemanticChecker implements ASTVisitor {
             if(!(type instanceof ArrayType) && !gScope.hasType(type.toString())) throw new syntaxError("Invalid argument type " + type.toString(), it.pos());
             newScope.defineVariable(new Variable(type, it.argNames.get(i)), it.pos());
         }
+        hasReturnedStack.push(false);
         if(!it.isVoid) {
             Type returnType = new TypeBuilder().build(it.returnType);
             if (!(returnType instanceof ArrayType) && !gScope.hasType(returnType.toString())) throw new syntaxError("Invalid return type " + returnType.toString(), it.pos());
             expectedReturnTypeStack.push(returnType);
-            hasReturnedStack.push(false);
         } else expectedReturnTypeStack.push(gScope.getVoidType());
 
         // visit function body

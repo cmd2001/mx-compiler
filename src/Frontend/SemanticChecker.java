@@ -71,7 +71,7 @@ public class SemanticChecker implements ASTVisitor {
 
         // visit function body
         visit(it.funcBody);
-        if(!it.funcName.equals("main") && !hasReturnedStack.peek()) throw new syntaxError("No return value in non-void function", it.pos());
+        if(!it.funcName.equals("main") && !it.isVoid && !hasReturnedStack.peek()) throw new syntaxError("No return value in non-void function", it.pos());
 
         // pop stack
         scopeStack.pop();

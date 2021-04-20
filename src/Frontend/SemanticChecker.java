@@ -46,7 +46,7 @@ public class SemanticChecker implements ASTVisitor {
                 curClass.defineFunction(func, x.pos());
             }
             for(ConstructFunctionDefNode t: a.classDefNode.constructFunctions) {
-                if(t.constructionFunctionName != a.classDefNode.className) throw new syntaxError("construction function name different to class name", t.pos());
+                if(!t.constructionFunctionName.equals(a.classDefNode.className)) throw new syntaxError("construction function name different to class name", t.pos());
                 curClass.defineConstructor(new FunctionType(a.classDefNode.className, gScope.getVoidType()), t.pos());
             }
         }

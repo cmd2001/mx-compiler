@@ -327,8 +327,11 @@ public class SemanticChecker implements ASTVisitor {
         if(!(array instanceof ArrayType)) throw new syntaxError("invalid array in subscriptExpression", it.array.pos());
         visit(it.index);
         if(!it.index.valueType.equals(gScope.getIntType())) throw new syntaxError("invalid index in subscriptExpression", it.index.pos());
-        if(((ArrayType) array).dim == 1) it.valueType = ((ArrayType) array).basicType;
-        else it.valueType = new ArrayType(((ArrayType) array).dim - 1, ((ArrayType) array).basicType);
+        if(((ArrayType) array).dim == 1) {
+            String type = ((ArrayType) array).basicType.toString();
+            if(!gScope.hasType(type)) throw new internalError("Basic type not found after decleration???", it.pos());
+            it.valueType = gScope.getType(type);
+        } else it.valueType = new ArrayType(((ArrayType) array).dim - 1, ((ArrayType) array).basicType);
     }
 
     @Override

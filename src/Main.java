@@ -18,7 +18,7 @@ import java.io.InputStream;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        // InputStream input = new FileInputStream("/Users/xzy/Desktop/Compiler-2020-testcases/sema/codeforces-package/158A.mx");
+        // InputStream input = new FileInputStream("/Users/xzy/Desktop/Compiler-2020-testcases/sema/string-package/string-1.mx");
         InputStream input = System.in;
         try {
             mxLexer lexer = new mxLexer(CharStreams.fromStream(input));

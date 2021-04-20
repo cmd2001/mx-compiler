@@ -223,7 +223,7 @@ public class SemanticChecker implements ASTVisitor {
             case Sub -> {
                 visit(it.subExpressionNode);
                 it.valueType = it.subExpressionNode.valueType;
-                it.isLeft = it.subscriptExpressionNode.isLeft;
+                it.isLeft = it.subExpressionNode.isLeft;
             }
             case This -> {
                 visit(it.thisExpressionNode);

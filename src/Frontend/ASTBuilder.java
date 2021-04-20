@@ -296,7 +296,7 @@ public class ASTBuilder extends mxBaseVisitor<ASTNode> {
 	public ExpressionNode visitSubExpression(mxParser.SubExpressionContext ctx) {
 		ExpressionNode ret = new ExpressionNode(new position(ctx));
 		ret.expressionType = ExpressionNode.ExpressionType.Sub;
-		ret.subscriptExpressionNode = new SubscriptExpressionNode(new position(ctx));
+		ret.subExpressionNode = new SubExpressionNode(new position(ctx));
 		ret.subExpressionNode.expression = (ExpressionNode) visit(ctx.expression());
 		return ret;
 	}

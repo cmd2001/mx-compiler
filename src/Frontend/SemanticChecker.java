@@ -167,8 +167,10 @@ public class SemanticChecker implements ASTVisitor {
             }
             if(it.expression != null) {
                 visit(it.expression);
-                // io.debug(it.expression.valueType.toString());
-                if(!it.expression.valueType.equals(expectedReturnTypeStack.peek())) throw new syntaxError("Incorrect return type", it.pos());
+                if(!it.expression.valueType.equals(expectedReturnTypeStack.peek())) {
+                    if(!(it.expression.valueType.equals(gScope.getNullType()) && expectedReturnTypeStack.peek() instanceof ClassType && !((expectedReturnTypeStack.peek()) instanceof StringType)))
+                        throw new syntaxError("Incorrect return type", it.pos());
+                }
                 hasReturnedStack.pop();
                 hasReturnedStack.push(true);
             } else if(!expectedReturnTypeStack.peek().equals(gScope.getVoidType())) throw new syntaxError("Incorrect return type", it.pos());
@@ -337,7 +339,6 @@ public class SemanticChecker implements ASTVisitor {
         if(!(base instanceof ClassType)) throw new syntaxError("Invalid member expression", it.pos());
         if(((ClassType) base).hasVariable(it.id, false)) {
             it.valueType = ((ClassType) base).getVariable(it.id, false).type;
-            // io.debug("member type = "+ it.valueType.toString());
             it.isLeft = true;
         }
         else if(((ClassType) base).hasFunction(it.id, false)) {
@@ -402,10 +403,7 @@ public class SemanticChecker implements ASTVisitor {
     public void visit(BinaryExpressionNode it) {
         visit(it.src1);
         visit(it.src2);
-        io.debug(it.src1.valueType);
-        io.debug(it.src2.valueType);
         if(!it.src1.valueType.equals(it.src2.valueType)) {
-            io.debug("Not equal");
             if((it.src1.valueType instanceof ClassType && !(it.src1.valueType instanceof StringType) && it.src2.valueType.equals(gScope.getNullType())) ||
                     (it.src2.valueType instanceof ClassType && !(it.src2.valueType instanceof StringType) && it.src1.valueType.equals(gScope.getNullType()))) { // fuck null
                 if(it.op == BinaryExpressionNode.BianryOp.Equal || it.op == BinaryExpressionNode.BianryOp.NotEqual) it.valueType = gScope.getBoolType();

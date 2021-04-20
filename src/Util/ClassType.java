@@ -15,6 +15,7 @@ public class ClassType extends Type {
     public void defineVariable(Variable variable, position pos) { localScope.defineVariable(variable, pos); }
     public void printFunctions() { localScope.printFunctions(); }
     public void printVariables() { localScope.printVariables(); }
+    public void defineConstructor(FunctionType constructor, position pos) { localScope.defineConstructor(constructor, pos); }
     @Override
     public String toString() { return name; }
     public boolean equals(Type rhs) {

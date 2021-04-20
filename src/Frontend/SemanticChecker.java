@@ -24,6 +24,30 @@ public class SemanticChecker implements ASTVisitor {
             if(!gScope.checkClassName(className)) throw new syntaxError("Class name same to a class/function/variable", x.pos());
             gScope.addType(className, new ClassType(className, gScope), x.pos());
         }
+        for(CompoundStatementNode a: it.compoundStatements) if(a.isClassDefStatement) {
+            ClassType curClass = (ClassType) gScope.getType(a.classDefNode.className);
+            for(VarDefStatementNode x: a.classDefNode.variables) {
+                Type type = new TypeBuilder().build(x.type);
+                if(!(type instanceof ArrayType) && !gScope.hasType(type.toString())) throw new syntaxError("Invalid type " + type.toString(), x.pos());
+                type = gScope.getType(type.toString()); // link global type!
+                for(VarDefNode v: x.variables) {
+                    if(v.expression != null) throw new syntaxError("Assigning value when defining variable in class is INVALID", it.pos());
+                    if(curClass.hasVariable(v.variableName, false)) throw new syntaxError("Variable defined twice in Class", it.pos());
+                    curClass.defineVariable(new Variable(type, v.variableName), v.pos());
+                }
+            }
+            for(FunctionDefNode x: a.classDefNode.functions) {
+                if(curClass.hasFunction(x.funcName, false)) throw new syntaxError("Function defined twice in Class" , x.pos());
+                if(gScope.hasType(x.funcName))  throw new syntaxError("Function name same to a Type" , x.pos());
+                if(x.funcName.equals(a.classDefNode.className)) throw new syntaxError("Invalid construction function", x.pos());
+                // no need to check arguments type and name, this will be done when visiting function.
+                curClass.defineFunction(new FunctionType(x, false), x.pos());
+            }
+            for(ConstructFunctionDefNode t: a.classDefNode.constructFunctions) {
+                curClass.defineConstructor(new FunctionType(a.classDefNode.className, gScope.getVoidType()), t.pos());
+            }
+        }
+
         for(CompoundStatementNode x: it.compoundStatements) if(x.isFuncDefStatement) {
             String funcName = x.functionDefNode.funcName;
             if(!gScope.checkFunctionName(funcName)) throw new syntaxError("Function name same to a class/function", x.pos());
@@ -63,13 +87,14 @@ public class SemanticChecker implements ASTVisitor {
             if(gScope.hasType(it.argNames.get(i))) throw new syntaxError("Argument name same to a Class", it.pos()); // fixme: is this necessary?
             Type type = new TypeBuilder().build(it.argTypes.get(i));
             if(!(type instanceof ArrayType) && !gScope.hasType(type.toString())) throw new syntaxError("Invalid argument type " + type.toString(), it.pos());
-            // io.debug("defineing variable " + it.argNames.get(i));
+            if(!(type instanceof ArrayType)) type = gScope.getType(type.toString());
             newScope.defineVariable(new Variable(type, it.argNames.get(i)), it.pos());
         }
         hasReturnedStack.push(false);
         if(!it.isVoid) {
             Type returnType = new TypeBuilder().build(it.returnType);
             if (!(returnType instanceof ArrayType) && !gScope.hasType(returnType.toString())) throw new syntaxError("Invalid return type " + returnType.toString(), it.pos());
+            if(!(returnType instanceof ArrayType)) returnType = gScope.getType(returnType.toString());
             expectedReturnTypeStack.push(returnType);
         } else expectedReturnTypeStack.push(gScope.getVoidType());
 
@@ -96,32 +121,10 @@ public class SemanticChecker implements ASTVisitor {
     @Override
     public void visit(ClassDefNode it) {
         // create scope and push stack
-        Scope newScope = new Scope(scopeStack.peek());
-        ((ClassType) gScope.getType(it.className)).localScope = newScope;
+        Scope newScope = new Scope(((ClassType) gScope.getType(it.className)).localScope);
         scopeStack.push(newScope);
         controlFlowStack.push(ControlFlow.CLASS);
         currentClassStack.push(it.className);
-
-        // check definition
-        for(VarDefStatementNode x: it.variables) {
-            Type type = new TypeBuilder().build(x.type);
-            if(!(type instanceof ArrayType) && !gScope.hasType(type.toString())) throw new syntaxError("Invalid type " + type.toString(), x.pos());
-            for(VarDefNode v: x.variables) {
-                if(v.expression != null) throw new syntaxError("Assigning value when defining variable in class is INVALID", it.pos());
-                if(newScope.hasVariable(v.variableName, false)) throw new syntaxError("Variable defined twice in Class", it.pos());
-                newScope.defineVariable(new Variable(type, v.variableName), v.pos());
-            }
-        }
-        for(FunctionDefNode x: it.functions) {
-            if(newScope.hasFunction(x.funcName, false)) throw new syntaxError("Function defined twice in Class" , x.pos());
-            if(gScope.hasType(x.funcName))  throw new syntaxError("Function name same to a Type" , x.pos());
-            if(x.funcName.equals(it.className)) throw new syntaxError("Invalid construction function", x.pos());
-            // no need to check arguments type and name, this will be done when visiting function.
-            newScope.defineFunction(new FunctionType(x, false), x.pos());
-        }
-        for(ConstructFunctionDefNode t: it.constructFunctions) {
-            newScope.defineConstructor(new FunctionType(it.className, gScope.getVoidType()), t.pos());
-        }
 
         // check functions
         for(FunctionDefNode x: it.functions) visit(x);
@@ -182,7 +185,6 @@ public class SemanticChecker implements ASTVisitor {
         if(!(type instanceof ArrayType)) type = gScope.getType(type.toString());
         for(VarDefNode t: it.variables) {
             if(t.expression != null) visit(t.expression);
-            // if(type instanceof ClassType) ((ClassType) type).printFunctions();
             scopeStack.peek().defineVariable(new Variable(type, t.variableName), t.pos());
         }
     }
@@ -475,16 +477,12 @@ public class SemanticChecker implements ASTVisitor {
             String id = (it.isBasicCreator ? it.basicCreator.basicType : it.classCreator.basicType).id;
             if(!gScope.hasType(id)) throw new syntaxError("invalid type" + id, it.pos());
             it.valueType = gScope.getType(id);
-            /* io.debug("in creater node");
-            io.debug(it.valueType.toString());
-            if(it.valueType instanceof ClassType) {
-                io.debug("functions:");
-                ((ClassType) it.valueType).printFunctions();
-                io.debug("variables:");
-                ((ClassType) it.valueType).printVariables();
-            } */
         } else if(it.isArrayCreator) {
             Type type = new TypeBuilder().build(it.arrayCreator.basicType);
+            if(!(type instanceof ArrayType)) {
+                if(!gScope.hasType(type.toString())) throw new internalError("In creator type " + type.toString() + " not Found!!", it.pos());
+                type = gScope.getType(type.toString());
+            }
             for(ExpressionNode x: it.arrayCreator.sizes) {
                 visit(x);
                 if(!x.valueType.equals(gScope.getIntType())) throw new syntaxError("Array dim size is not int", x.pos());

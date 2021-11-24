@@ -2,12 +2,11 @@ package LLVMIR.TypeSystem;
 
 import java.util.ArrayList;
 
-public class FunctionType extends IRType {
+public class IRFunctionType extends IRType {
     public IRType returnType;
     public ArrayList<IRType> parameterList;
-    public FunctionType(IRType returnType, ArrayList<IRType> parameterList) { this.returnType = returnType; this.parameterList = parameterList; }
-    @Override
-    public int getBytes() { return 0; }
+    public IRFunctionType(IRType returnType, ArrayList<IRType> parameterList) { this.returnType = returnType; this.parameterList = parameterList; }
+    @Override public int getBytes() { return 0; }
     @Override
     public String toString() {
         StringBuilder string = new StringBuilder();

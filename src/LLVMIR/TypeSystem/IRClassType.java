@@ -2,10 +2,10 @@ package LLVMIR.TypeSystem;
 
 import java.util.ArrayList;
 
-public class ClassType extends IRType {
+public class IRClassType extends IRType {
     public String name;
     public ArrayList<IRType> memberList;
-    public ClassType(String name, ArrayList<IRType> memberList) { this.name = name; this.memberList = memberList; }
+    public IRClassType(String name, ArrayList<IRType> memberList) { this.name = name; this.memberList = memberList; }
     @Override
     public int getBytes() {
         int size = 0;

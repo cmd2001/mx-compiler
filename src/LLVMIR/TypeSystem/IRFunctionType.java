@@ -3,9 +3,10 @@ package LLVMIR.TypeSystem;
 import java.util.ArrayList;
 
 public class IRFunctionType extends IRType {
+    public String name;
     public IRType returnType;
     public ArrayList<IRType> parameterList;
-    public IRFunctionType(IRType returnType, ArrayList<IRType> parameterList) { this.returnType = returnType; this.parameterList = parameterList; }
+    public IRFunctionType(String name, IRType returnType, ArrayList<IRType> parameterList) { this.name = name; this.returnType = returnType; this.parameterList = parameterList; }
     @Override public int getBytes() { return 0; }
     @Override
     public String toString() {

@@ -4,8 +4,8 @@ import LLVMIR.Block.IRBlock;
 import LLVMIR.Operand.Operand;
 
 public class Branch extends Inst {
-    private Operand condition;
-    private IRBlock trueDest, falseDest;
+    public Operand condition;
+    public IRBlock trueDest, falseDest;
 
     public Branch(Operand condition, IRBlock trueDest, IRBlock falseDest, IRBlock block) {
         super(null, block);

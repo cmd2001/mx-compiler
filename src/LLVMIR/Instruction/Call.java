@@ -4,7 +4,6 @@ import LLVMIR.Block.IRBlock;
 import LLVMIR.Operand.Operand;
 import LLVMIR.Operand.Register;
 import LLVMIR.TypeSystem.IRFunctionType;
-import LLVMIR.TypeSystem.IRIntType;
 
 import java.util.ArrayList;
 

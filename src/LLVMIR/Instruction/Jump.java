@@ -3,7 +3,7 @@ package LLVMIR.Instruction;
 import LLVMIR.Block.IRBlock;
 
 public class Jump extends Inst {
-    private IRBlock jumpDest;
+    public IRBlock jumpDest;
 
     public Jump(IRBlock jumpDest, IRBlock block) {
         super(null, block);
